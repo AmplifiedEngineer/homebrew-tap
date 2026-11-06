@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Tests bump-formula.sh against release folders built here and read through
 # DOWNLOAD_BASE, so nothing touches the network. It checks the release notes
-# line in the caveats, the pbtop template, the refusal of
-# the retired playbook-telemetry formula and latest-release.sh against a stub gh.
+# line in the caveats, the pbtop template
+# and latest-release.sh against a stub gh.
 # Usage: test-bump-formula.sh [--keep]
 # With --keep, Formula/pbtop.rb and a Formula/playbook.rb with pbdoc are left as a release writes it, so a style and
 # audit run can check it.
@@ -158,17 +158,6 @@ else
   fail "the pbtop template conflicts with playbook and ends its caveats with the release notes line"
 fi
 
-mkdir -p "$work/t"
-cp "$root/Formula/playbook-telemetry.rb" "$work/t/playbook-telemetry.rb"
-dir="$(tool_release playbook-telemetry 9.7.0)"
-if ! DOWNLOAD_BASE="file://$dir" bash "$script" 9.7.0 "$work/t/playbook-telemetry.rb" >/dev/null 2>"$work/err" \
-  && grep -qxF '::error::playbook-telemetry is retired; use pbtop' "$work/err" \
-  && cmp -s "$root/Formula/playbook-telemetry.rb" "$work/t/playbook-telemetry.rb"; then
-  pass "bump-formula.sh refuses playbook-telemetry and leaves it unchanged"
-else
-  fail "bump-formula.sh refuses playbook-telemetry and leaves it unchanged"
-fi
-
 # latest-release.sh against a stub gh. GH_RELEASES is the release list as
 # JSON, and GH_ASSETS_<version with _> the asset names of a release.
 latest="$root/.github/scripts/latest-release.sh"
@@ -208,12 +197,6 @@ if [[ "$(GH_ASSETS_v9_1_0="playbook-9.1.0-x86_64-unknown-linux-musl" \
   pass "pbtop skips a v release without its archive"
 else
   fail "pbtop skips a v release without its archive"
-fi
-if ! lookup playbook-telemetry >/dev/null \
-  && grep -qxF '::error::playbook-telemetry is retired; use pbtop' "$work/err"; then
-  pass "latest-release.sh refuses playbook-telemetry"
-else
-  fail "latest-release.sh refuses playbook-telemetry"
 fi
 if [[ "$(lookup playbook)" = "playbook v 9.1.0" ]]; then
   pass "playbook takes the newest v release"

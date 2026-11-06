@@ -3,7 +3,6 @@
 # Releases come from pragmatic-engineer/playbook:
 #   playbook            v            the raw binary
 #   pbtop               v            from the first v release that carries its archive
-# playbook-telemetry is retired and replaced by pbtop, so it has no lookup.
 # Since playbook 0.34.0 one v release ships every tool (ADR 0038 in
 # pragmatic-engineer/playbook), so a v release counts for a tool only when it
 # has the tool's asset. Until a prefixed release exists in playbook, a formula
@@ -16,10 +15,6 @@ set -euo pipefail
 formula="${1:?usage: latest-release.sh <formula>}"
 case "$formula" in
   playbook) candidates=("playbook v -") ;;
-  playbook-telemetry)
-    echo "::error::playbook-telemetry is retired; use pbtop" >&2
-    exit 1
-    ;;
   pbtop) candidates=("playbook v asset") ;;
   *)
     echo "::error::no release mapping for formula '${formula}'" >&2
