@@ -30,6 +30,7 @@ case "$name" in
   pbtop)
     repo="playbook"; prefix="v"; suffix=".tar.gz"
     class_name="Pbtop"; alias_bin=""
+    conflicts="playbook"
     desc="Terminal dashboard of Claude Code token use and cost"
     ;;
   *)
@@ -71,6 +72,10 @@ write_template() {
       printf '      url "%s/%s-%s-%s%s"\n      sha256 "%s"\n' "$base" "$name" "$version" "$t_x" "$suffix" "$zero"
       printf '    end\n  end\n'
     done
+    if [[ -n "${conflicts:-}" ]]; then
+      printf '\n  conflicts_with "%s",\n' "$conflicts"
+      printf '                because: "%s already provides %s. Run: brew uninstall %s, then brew reinstall %s"\n' "$conflicts" "$name" "$name" "$conflicts"
+    fi
     if [[ -n "$alias_bin" ]]; then
       printf '\n  def install\n    bin.install "%s", "%s"\n  end\n' "$name" "$alias_bin"
       # shellcheck disable=SC2016 # the backticks are literal caveats text
@@ -82,6 +87,10 @@ write_template() {
       printf '\n  def install\n    bin.install "%s"\n  end\n' "$name"
       # shellcheck disable=SC2016 # the backticks are literal caveats text
       printf '\n  def caveats\n    <<~EOS\n      Run `%s` to start.\n' "$name"
+      if [[ -n "${conflicts:-}" ]]; then
+        printf '      This formula is for a machine without %s. The %s formula links\n' "$conflicts" "$conflicts"
+        printf '      `%s` to `%s`, so if you install %s later, run `brew uninstall %s` first.\n' "$name" "$conflicts" "$conflicts" "$name"
+      fi
       printf '      %s\n    EOS\n  end\n' "$notes"
       printf '\n  test do\n    assert_match version.to_s, shell_output("#{bin}/%s --version")\n  end\nend\n' "$name"
     fi

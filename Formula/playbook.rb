@@ -45,8 +45,12 @@ class Playbook < Formula
     end
   end
 
+  conflicts_with "pbtop",
+                because: "playbook already provides pbtop. Run: brew uninstall pbtop, then brew reinstall playbook"
+
   def install
     bin.install Dir["playbook-*"].first => "playbook"
+    bin.install_symlink "playbook" => "pbtop"
     bin.install_symlink "playbook" => "pb"
     resource("pbdoc").stage do
       bin.install "pbdoc"
@@ -64,6 +68,9 @@ class Playbook < Formula
       `claude plugin uninstall playbook-hooks@pragmatic-engineer` first.
       Start sessions with `playbook cc` or `playbook ccd`. `pb` is a short alias,
       so `pb cc` and `pb ccd` work too.
+      `pbtop` is a link to `playbook` too. It opens the usage dashboard and always has
+      the version of `playbook`, so `brew upgrade playbook` updates both. If the separate
+      `pbtop` formula is installed, run `brew uninstall pbtop`, then `brew reinstall playbook`.
       Installing never edits your Claude Code settings. Upgrade with `brew upgrade playbook`.
       Release notes: https://github.com/pragmatic-engineer/playbook/releases/tag/v#{version}
     EOS
@@ -71,6 +78,7 @@ class Playbook < Formula
 
   test do
     assert_match version.to_s, shell_output("#{bin}/playbook --version")
+    assert_match "pbtop #{version}", shell_output("#{bin}/pbtop --version")
     assert_match version.to_s, shell_output("#{bin}/pb --version")
     assert_match version.to_s, shell_output("#{bin}/pbdoc --version")
   end

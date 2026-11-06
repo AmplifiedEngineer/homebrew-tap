@@ -29,6 +29,9 @@ class Pbtop < Formula
     end
   end
 
+  conflicts_with "playbook",
+                because: "playbook already provides pbtop. Run: brew uninstall pbtop, then brew reinstall playbook"
+
   def install
     bin.install "pbtop"
   end
@@ -36,6 +39,8 @@ class Pbtop < Formula
   def caveats
     <<~EOS
       Run `pbtop` to start.
+      This formula is for a machine without playbook. The playbook formula links
+      `pbtop` to `playbook`, so if you install playbook later, run `brew uninstall pbtop` first.
       Release notes: https://github.com/pragmatic-engineer/playbook/releases/tag/v#{version}
     EOS
   end

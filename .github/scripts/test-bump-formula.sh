@@ -86,6 +86,16 @@ else
   fail "a bump with pbdoc archives writes one pbdoc resource per target and installs it"
 fi
 
+# The pbtop link and the conflict stay as they are, and the pbdoc step goes after the pb link.
+if grep -qx '    bin.install_symlink "playbook" => "pbtop"' "$pbf" \
+  && grep -q '^  conflicts_with "pbtop"' "$pbf" \
+  && grep -qF '"#{bin}/pbtop --version"' "$pbf" \
+  && [[ "$(grep -n 'install_symlink "playbook" => "pb"' "$pbf" | cut -d: -f1)" -lt "$(grep -n 'resource("pbdoc").stage' "$pbf" | cut -d: -f1)" ]]; then
+  pass "a bump keeps the pbtop link and the conflict and puts pbdoc after the pb link"
+else
+  fail "a bump keeps the pbtop link and the conflict and puts pbdoc after the pb link"
+fi
+
 # Running it again, and then on a release without pbdoc, leaves a valid formula.
 cp "$pbf" "$work/b/first.rb"
 if DOWNLOAD_BASE="file://$dir" bash "$script" 9.2.0 "$pbf" >/dev/null 2>"$work/err" \
@@ -139,12 +149,13 @@ if DOWNLOAD_BASE="file://$dir" bash "$script" 9.7.0 "$pbtop" >/dev/null 2>"$work
 else
   fail "the pbtop formula is written from its template"
 fi
-if ! grep -q 'conflicts_with' "$pbtop" \
+if grep -q '^  conflicts_with "playbook",$' "$pbtop" \
+  && grep -q '^                because: ".*brew uninstall pbtop' "$pbtop" \
   && [[ "$(grep -cxF "$notes" "$pbtop")" -eq 1 ]] \
   && [[ "$(grep -A1 -xF "$notes" "$pbtop" | tail -n1)" = '    EOS' ]]; then
-  pass "the pbtop template has no conflicts_with and ends its caveats with the release notes line"
+  pass "the pbtop template conflicts with playbook and ends its caveats with the release notes line"
 else
-  fail "the pbtop template has no conflicts_with and ends its caveats with the release notes line"
+  fail "the pbtop template conflicts with playbook and ends its caveats with the release notes line"
 fi
 
 mkdir -p "$work/t"
