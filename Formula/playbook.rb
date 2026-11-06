@@ -11,36 +11,36 @@ class Playbook < Formula
 
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/pragmatic-engineer/playbook/releases/download/v0.40.1/playbook-0.40.1-aarch64-apple-darwin"
-      sha256 "50c848be5056076b93f44a76e36d0d7f4e9727cdb8ae5f529d0db918f837f2c3"
+      url "https://github.com/pragmatic-engineer/playbook/releases/download/v0.40.2/playbook-0.40.2-aarch64-apple-darwin"
+      sha256 "7d72c57347c5452df43315db2e14cf032c8407260ffb1cc6ebdb8c75ea05db90"
       resource "pbdoc" do
-        url "https://github.com/pragmatic-engineer/playbook/releases/download/v0.40.1/pbdoc-0.40.1-aarch64-apple-darwin.tar.gz"
-        sha256 "afeb0679ca8e53d2a82d296fed47407d003a18682e028433d03db6e4833939af"
+        url "https://github.com/pragmatic-engineer/playbook/releases/download/v0.40.2/pbdoc-0.40.2-aarch64-apple-darwin.tar.gz"
+        sha256 "09b3046b9158c3f7711717986283066359563791abfc99996e00a01defd7f54e"
       end
     else
-      url "https://github.com/pragmatic-engineer/playbook/releases/download/v0.40.1/playbook-0.40.1-x86_64-apple-darwin"
-      sha256 "2713e5571011d92563f24801a6b1981e234a6cb59136ef3e1c0281de8af1b107"
+      url "https://github.com/pragmatic-engineer/playbook/releases/download/v0.40.2/playbook-0.40.2-x86_64-apple-darwin"
+      sha256 "dfe572c8bca983c7e59a1e8494924a59fa9786b91f2ed198b5954906ca2f5bca"
       resource "pbdoc" do
-        url "https://github.com/pragmatic-engineer/playbook/releases/download/v0.40.1/pbdoc-0.40.1-x86_64-apple-darwin.tar.gz"
-        sha256 "a4fb8225bc76e2b3ab1d47e74d80f52f8d146e14a094066fd7827781c8732483"
+        url "https://github.com/pragmatic-engineer/playbook/releases/download/v0.40.2/pbdoc-0.40.2-x86_64-apple-darwin.tar.gz"
+        sha256 "23dcd1cdf576f06735b7fc3c308bbfe6250e7c178f74a3f5484249a20c942d62"
       end
     end
   end
 
   on_linux do
     if Hardware::CPU.arm?
-      url "https://github.com/pragmatic-engineer/playbook/releases/download/v0.40.1/playbook-0.40.1-aarch64-unknown-linux-musl"
-      sha256 "7b253e94067b97f0c8f5a1fa202b979905b07dd7ca1fb42d930f61448c724844"
+      url "https://github.com/pragmatic-engineer/playbook/releases/download/v0.40.2/playbook-0.40.2-aarch64-unknown-linux-musl"
+      sha256 "017d6447c77f01662ac7e675734d321ffa72c800b83d18e8d2c4b333118109d4"
       resource "pbdoc" do
-        url "https://github.com/pragmatic-engineer/playbook/releases/download/v0.40.1/pbdoc-0.40.1-aarch64-unknown-linux-musl.tar.gz"
-        sha256 "363f4e4463ad601fd8d1d55197c92872e34f7d9a1d20cfa8fd3fbbaf11528c8a"
+        url "https://github.com/pragmatic-engineer/playbook/releases/download/v0.40.2/pbdoc-0.40.2-aarch64-unknown-linux-musl.tar.gz"
+        sha256 "3b7006e47066989cd226196dd78ef05fc04714b2250f4c46c0f0782e0082efa8"
       end
     else
-      url "https://github.com/pragmatic-engineer/playbook/releases/download/v0.40.1/playbook-0.40.1-x86_64-unknown-linux-musl"
-      sha256 "af4e48cf8b1a45ccbbd6280d6a3af87b57ce7c0200364a53b261bab32d167c4c"
+      url "https://github.com/pragmatic-engineer/playbook/releases/download/v0.40.2/playbook-0.40.2-x86_64-unknown-linux-musl"
+      sha256 "32686c31d4ccdbeb874122416b160b41bf349278bf5b01a25c1155cc69758654"
       resource "pbdoc" do
-        url "https://github.com/pragmatic-engineer/playbook/releases/download/v0.40.1/pbdoc-0.40.1-x86_64-unknown-linux-musl.tar.gz"
-        sha256 "88a52abcb6bfe733f9386c308bcdecc312f53dc4cde08d707126e3f4a5394db2"
+        url "https://github.com/pragmatic-engineer/playbook/releases/download/v0.40.2/pbdoc-0.40.2-x86_64-unknown-linux-musl.tar.gz"
+        sha256 "dc5b3246ead807a87ff4f9a22f113e165f9e484577138f11beaee4e79b49a6ae"
       end
     end
   end
