@@ -13,21 +13,21 @@ class Pbtop < Formula
 
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/pragmatic-engineer/playbook/releases/download/v0.40.1/pbtop-0.40.1-aarch64-apple-darwin.tar.gz"
-      sha256 "0306b36ee7c0dcf36ad2a81a7fe79b61aeb1857091947dc259ca4046b83b0e64"
+      url "https://github.com/pragmatic-engineer/playbook/releases/download/v0.40.2/pbtop-0.40.2-aarch64-apple-darwin.tar.gz"
+      sha256 "05a399ff997589a6076a8d03ea37f4cfe8d33c3267c2317571ca786b26e2e557"
     else
-      url "https://github.com/pragmatic-engineer/playbook/releases/download/v0.40.1/pbtop-0.40.1-x86_64-apple-darwin.tar.gz"
-      sha256 "fc81061d17d865e46328e2280a54371b08cb1fbf98611278f6582b3467971adf"
+      url "https://github.com/pragmatic-engineer/playbook/releases/download/v0.40.2/pbtop-0.40.2-x86_64-apple-darwin.tar.gz"
+      sha256 "ad68cd5db92e03d8418124c37854c434699e2c01ce6070390796597555183171"
     end
   end
 
   on_linux do
     if Hardware::CPU.arm?
-      url "https://github.com/pragmatic-engineer/playbook/releases/download/v0.40.1/pbtop-0.40.1-aarch64-unknown-linux-musl.tar.gz"
-      sha256 "e9d3648cfa025e3eae2e2abddf2dd95899a4943ef456fabf40f4d74ea573d04d"
+      url "https://github.com/pragmatic-engineer/playbook/releases/download/v0.40.2/pbtop-0.40.2-aarch64-unknown-linux-musl.tar.gz"
+      sha256 "c5371ad01546f82d614346ad18e2c53fd0e6cc2dde2ff5fe3e76996f4d23133b"
     else
-      url "https://github.com/pragmatic-engineer/playbook/releases/download/v0.40.1/pbtop-0.40.1-x86_64-unknown-linux-musl.tar.gz"
-      sha256 "654115f64e28ae10f28d6d80eab839b78eadf7d1fc4d18d055e896a98c914e8a"
+      url "https://github.com/pragmatic-engineer/playbook/releases/download/v0.40.2/pbtop-0.40.2-x86_64-unknown-linux-musl.tar.gz"
+      sha256 "270d4ca09d0df6d29daa186f8730219fc8ee9e6f30cf9deded2d0217f73df28b"
     end
   end
 
