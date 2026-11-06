@@ -149,7 +149,8 @@ if DOWNLOAD_BASE="file://$dir" bash "$script" 9.7.0 "$pbtop" >/dev/null 2>"$work
 else
   fail "the pbtop formula is written from its template"
 fi
-if grep -q '^  conflicts_with "playbook", because: ".*brew uninstall pbtop' "$pbtop" \
+if grep -q '^  conflicts_with "playbook",$' "$pbtop" \
+  && grep -q '^                because: ".*brew uninstall pbtop' "$pbtop" \
   && [[ "$(grep -cxF "$notes" "$pbtop")" -eq 1 ]] \
   && [[ "$(grep -A1 -xF "$notes" "$pbtop" | tail -n1)" = '    EOS' ]]; then
   pass "the pbtop template conflicts with playbook and ends its caveats with the release notes line"

@@ -62,9 +62,6 @@ write_template() {
     printf '  homepage "https://github.com/pragmatic-engineer/%s"\n' "$repo"
     printf '  license "Apache-2.0"\n\n'
     printf '  livecheck do\n    url :stable\n    strategy :github_releases\n    regex(/^%sv(\\d+(?:\\.\\d+)+)$/i)\n  end\n' "${prefix%v}"
-    if [[ -n "${conflicts:-}" ]]; then
-      printf '\n  conflicts_with "%s", because: "%s already provides %s. Run: brew uninstall %s, then brew reinstall %s"\n' "$conflicts" "$conflicts" "$name" "$name" "$conflicts"
-    fi
     local os t_arm t_x
     for os in macos linux; do
       if [[ "$os" = macos ]]; then t_arm=aarch64-apple-darwin; t_x=x86_64-apple-darwin
@@ -75,6 +72,10 @@ write_template() {
       printf '      url "%s/%s-%s-%s%s"\n      sha256 "%s"\n' "$base" "$name" "$version" "$t_x" "$suffix" "$zero"
       printf '    end\n  end\n'
     done
+    if [[ -n "${conflicts:-}" ]]; then
+      printf '\n  conflicts_with "%s",\n' "$conflicts"
+      printf '                because: "%s already provides %s. Run: brew uninstall %s, then brew reinstall %s"\n' "$conflicts" "$name" "$name" "$conflicts"
+    fi
     if [[ -n "$alias_bin" ]]; then
       printf '\n  def install\n    bin.install "%s", "%s"\n  end\n' "$name" "$alias_bin"
       # shellcheck disable=SC2016 # the backticks are literal caveats text
