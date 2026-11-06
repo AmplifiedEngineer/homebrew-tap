@@ -9,8 +9,6 @@ class Playbook < Formula
     regex(/^v(\d+(?:\.\d+)+)$/i)
   end
 
-  conflicts_with "pbtop", because: "playbook already provides pbtop. Run: brew uninstall pbtop, then brew reinstall playbook"
-
   on_macos do
     if Hardware::CPU.arm?
       url "https://github.com/pragmatic-engineer/playbook/releases/download/v0.40.2/playbook-0.40.2-aarch64-apple-darwin"
@@ -46,6 +44,9 @@ class Playbook < Formula
       end
     end
   end
+
+  conflicts_with "pbtop",
+                because: "playbook already provides pbtop. Run: brew uninstall pbtop, then brew reinstall playbook"
 
   def install
     bin.install Dir["playbook-*"].first => "playbook"
