@@ -59,7 +59,7 @@ The `tests` workflow runs on every push to `main`, every pull request, weekly, a
 - `bump-script`: runs `.github/scripts/test-bump-formula.sh`, then a style check of the `pbtop` formula a release writes.
 - `install`: `brew audit --strict --online`, `brew install` and `brew test` on Linux and macOS (arm64 and x86_64).
 
-A disabled or deprecated formula, such as `playbook-telemetry`, is only audited. Bottles are not built, because the formulas install prebuilt binaries.
+A disabled or deprecated formula is only audited. Bottles are not built, because the formulas install prebuilt binaries.
 
 ## If a formula is behind
 

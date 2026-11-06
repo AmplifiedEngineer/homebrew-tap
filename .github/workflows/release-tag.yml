@@ -104,9 +104,9 @@ jobs:
             echo
             for f in Formula/*.rb; do
               name="$(basename "$f" .rb)"
-              # A retired, disabled or deprecated formula no longer follows
+              # A disabled or deprecated formula no longer follows
               # the releases, so the notes leave it out.
-              if [ "$name" = playbook-telemetry ] || grep -Eq '^  (disable|deprecate)!' "$f"; then
+              if grep -Eq '^  (disable|deprecate)!' "$f"; then
                 continue
               fi
               version="$(sed -nE 's#.*/download/(telemetry-v|v)([0-9][0-9.]*)/.*#\2#p' "$f" | head -n1)"

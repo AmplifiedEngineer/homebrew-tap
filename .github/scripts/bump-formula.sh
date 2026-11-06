@@ -3,8 +3,7 @@
 # The formula name picks the release asset suffix and the default source:
 #   playbook            pragmatic-engineer/playbook, tags vX.Y.Z       raw binary
 #   pbtop               pragmatic-engineer/playbook, tags vX.Y.Z       .tar.gz holding pbtop alone
-# Since playbook 0.34.0 one v release ships every tool. playbook-telemetry is
-# retired and replaced by pbtop, so it is no longer bumped.
+# Since playbook 0.34.0 one v release ships every tool.
 # The playbook formula also installs pbdoc, from the release's pbdoc-<version>-<target>.tar.gz
 # archives, as one resource per target next to the playbook binary. A release
 # with no pbdoc archive (older versions) gets a formula without the resource.
@@ -23,10 +22,6 @@ formula="${2:-Formula/playbook.rb}"
 name="$(basename "$formula" .rb)"
 case "$name" in
   playbook) repo="playbook"; prefix="v"; suffix="" ;;
-  playbook-telemetry)
-    echo "::error::playbook-telemetry is retired; use pbtop" >&2
-    exit 1
-    ;;
   pbtop)
     repo="playbook"; prefix="v"; suffix=".tar.gz"
     class_name="Pbtop"; alias_bin=""

@@ -6,7 +6,6 @@ Homebrew tap for the [pragmatic-engineer/playbook](https://github.com/pragmatic-
 |---|---|---|
 | `playbook` | `brew install pragmatic-engineer/tap/playbook` | The Claude Code plugin toolkit and its binary. It links `pbtop` to `playbook`. |
 | `pbtop` | `brew install pragmatic-engineer/tap/pbtop` | The token and cost dashboard, for a machine without `playbook`. |
-| `playbook-telemetry` | Retired. Install `pbtop` instead. | Replaced by `pbtop`. |
 
 ## Install
 
@@ -33,14 +32,6 @@ Run `brew trust` to list what you trust. Run `brew untrust <target>` to remove a
 Each formula downloads the prebuilt binary that the `pragmatic-engineer/playbook` release workflow builds, attests and checksums. It does not build from source. It uses the same `SHA256SUMS` that `install.sh` checks.
 
 Platforms: macOS (Apple Silicon and Intel) and Linux (x86_64 and arm64, static musl builds). Windows is not a Homebrew target. Use `install.sh` or WSL.
-
-## Retired: playbook-telemetry
-
-`playbook-telemetry` is replaced by `pbtop`. Homebrew shows it as deprecated until 2026-11-16, then disabled. To switch:
-
-```bash
-brew uninstall playbook-telemetry && brew install pbtop
-```
 
 ## Moved from the old tap
 
