@@ -9,6 +9,8 @@ class Pbtop < Formula
     regex(/^v(\d+(?:\.\d+)+)$/i)
   end
 
+  conflicts_with "playbook", because: "playbook already provides pbtop. Run: brew uninstall pbtop, then brew reinstall playbook"
+
   on_macos do
     if Hardware::CPU.arm?
       url "https://github.com/pragmatic-engineer/playbook/releases/download/v0.40.1/pbtop-0.40.1-aarch64-apple-darwin.tar.gz"
@@ -36,6 +38,8 @@ class Pbtop < Formula
   def caveats
     <<~EOS
       Run `pbtop` to start.
+      This formula is for a machine without playbook. The playbook formula links
+      `pbtop` to `playbook`, so if you install playbook later, run `brew uninstall pbtop` first.
       Release notes: https://github.com/pragmatic-engineer/playbook/releases/tag/v#{version}
     EOS
   end

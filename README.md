@@ -4,8 +4,8 @@ Homebrew tap for the [pragmatic-engineer/playbook](https://github.com/pragmatic-
 
 | Formula | Install | What it is |
 |---|---|---|
-| `playbook` | `brew install pragmatic-engineer/tap/playbook` | The Claude Code plugin toolkit and its binary. |
-| `pbtop` | `brew install pragmatic-engineer/tap/pbtop` | The token and cost dashboard. |
+| `playbook` | `brew install pragmatic-engineer/tap/playbook` | The Claude Code plugin toolkit and its binary. It links `pbtop` to `playbook`. |
+| `pbtop` | `brew install pragmatic-engineer/tap/pbtop` | The token and cost dashboard, for a machine without `playbook`. |
 | `playbook-telemetry` | Retired. Install `pbtop` instead. | Replaced by `pbtop`. |
 
 ## Install
@@ -14,7 +14,9 @@ Homebrew tap for the [pragmatic-engineer/playbook](https://github.com/pragmatic-
 brew install pragmatic-engineer/tap/playbook
 ```
 
-Upgrade with `brew upgrade playbook`. You do not need `pbtop` if you have `playbook`, because `playbook usage` runs the same code.
+Upgrade with `brew upgrade playbook`. The formula links `pbtop` to `playbook`, so one upgrade updates both and you do not install `pbtop` separately.
+
+The `pbtop` formula is for a machine without `playbook`, and the two formulas conflict because both own the `pbtop` file. If you installed `pbtop` before, run `brew uninstall pbtop` once, then `brew reinstall playbook`. Homebrew refuses to upgrade `playbook` while the old `pbtop` is installed, and its message names that command.
 
 ## Trust the tap
 
