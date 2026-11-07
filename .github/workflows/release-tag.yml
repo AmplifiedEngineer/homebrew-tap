@@ -1,7 +1,7 @@
 name: release-tag
 
 # The playbook release workflow opens release/vX.Y.Z here with the formulas of
-# playbook vX.Y.Z (ADR 0039 in pragmatic-engineer/playbook). When that pull
+# playbook vX.Y.Z (ADR 0039 in amplifiedengineer/playbook). When that pull
 # request merges, this workflow tags the merge commit vX.Y.Z and publishes a
 # release that lists the formula versions. Running it again keeps a tag that
 # points at the same commit and a release that exists.

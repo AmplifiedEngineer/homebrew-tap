@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # Print the latest published release for a formula as "<repo> <tag-prefix> <version>".
-# Releases come from pragmatic-engineer/playbook:
+# Releases come from amplifiedengineer/playbook:
 #   playbook            v            the raw binary
 #   pbtop               v            from the first v release that carries its archive
 # Since playbook 0.34.0 one v release ships every tool (ADR 0038 in
-# pragmatic-engineer/playbook), so a v release counts for a tool only when it
+# amplifiedengineer/playbook), so a v release counts for a tool only when it
 # has the tool's asset. Until a prefixed release exists in playbook, a formula
 # keeps following the legacy repo it shipped from. A legacy repo that does not
 # exist counts as no release, and any other failed lookup fails the script.
@@ -27,12 +27,12 @@ trap 'rm -f "$err"' EXIT
 
 for candidate in "${candidates[@]}"; do
   read -r repo prefix need <<<"$candidate"
-  if ! tags="$(gh release list --repo "pragmatic-engineer/${repo}" --limit 100 --json tagName,isDraft,isPrerelease \
+  if ! tags="$(gh release list --repo "amplifiedengineer/${repo}" --limit 100 --json tagName,isDraft,isPrerelease \
     --jq "[.[] | select(.isDraft == false and .isPrerelease == false) | .tagName | select(test(\"^${prefix}[0-9]+\\\\.[0-9]+\\\\.[0-9]+\$\"))] | .[]" 2>"$err")"; then
     if [ "$repo" != playbook ] && grep -q "Could not resolve to a Repository" "$err"; then
       continue
     fi
-    echo "::error::could not list the releases of pragmatic-engineer/${repo}: $(cat "$err")" >&2
+    echo "::error::could not list the releases of amplifiedengineer/${repo}: $(cat "$err")" >&2
     exit 1
   fi
   # Only the five newest releases are checked for an asset, which bounds the
@@ -44,7 +44,7 @@ for candidate in "${candidates[@]}"; do
     if [ "$need" = asset ]; then
       checked=$((checked + 1))
       [ "$checked" -le 5 ] || break
-      assets="$(gh release view "$tag" --repo "pragmatic-engineer/${repo}" --json assets --jq '.assets[].name')"
+      assets="$(gh release view "$tag" --repo "amplifiedengineer/${repo}" --json assets --jq '.assets[].name')"
       grep -qx "${formula}-${version}-x86_64-unknown-linux-musl.tar.gz" <<<"$assets" || continue
     fi
     printf '%s %s %s\n' "$repo" "$prefix" "$version"

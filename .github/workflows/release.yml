@@ -56,7 +56,7 @@ jobs:
           fi
           read -r source_repo tag_prefix latest <<<"$info"
           # The playbook release workflow opens release/vX.Y.Z here with every
-          # formula of a v release (ADR 0039 in pragmatic-engineer/playbook).
+          # formula of a v release (ADR 0039 in amplifiedengineer/playbook).
           # This run leaves the release to it while that pull request from the
           # app is open, and for the first hour after the release, when the
           # workflow may not have opened it yet. A run started by hand skips
@@ -73,7 +73,7 @@ jobs:
               return 0
             fi
             [ "$EVENT" != workflow_dispatch ] || return 1
-            published="$(gh release view "v$1" --repo pragmatic-engineer/playbook --json publishedAt --jq .publishedAt 2>/dev/null || true)"
+            published="$(gh release view "v$1" --repo amplifiedengineer/playbook --json publishedAt --jq .publishedAt 2>/dev/null || true)"
             published="$( [ -z "$published" ] || date -u -d "$published" +%s 2>/dev/null || true)"
             if [ -z "$published" ]; then
               echo "Could not read when v$1 was published. The next run checks again."
