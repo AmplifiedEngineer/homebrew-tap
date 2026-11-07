@@ -17,7 +17,7 @@ failures=0
 pass() { printf 'PASS %s\n' "$1"; }
 fail() { printf 'FAIL %s\n' "$1"; failures=$((failures + 1)); }
 
-notes='      Release notes: https://github.com/pragmatic-engineer/playbook/releases/tag/v#{version}'
+notes='      Release notes: https://github.com/amplifiedengineer/playbook/releases/tag/v#{version}'
 
 # release VERSION: builds a release folder with the playbook binaries.
 release() {
@@ -175,7 +175,7 @@ while [ "$#" -gt 0 ]; do
   esac
   shift
 done
-if [ "$repo" != pragmatic-engineer/playbook ]; then
+if [ "$repo" != amplifiedengineer/playbook ]; then
   echo "GraphQL: Could not resolve to a Repository with the name '${repo}'." >&2
   exit 1
 fi

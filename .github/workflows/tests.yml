@@ -74,7 +74,7 @@ jobs:
 
       - name: Link the checkout as the tap
         run: |
-          tap_dir="$(brew --repository)/Library/Taps/pragmatic-engineer"
+          tap_dir="$(brew --repository)/Library/Taps/amplifiedengineer"
           mkdir -p "$tap_dir"
           rm -rf "$tap_dir/homebrew-tap"
           ln -s "$GITHUB_WORKSPACE" "$tap_dir/homebrew-tap"
@@ -86,15 +86,15 @@ jobs:
           # its way out and points to its replacement.
           for f in Formula/*.rb; do
             name="$(basename "$f" .rb)"
-            brew audit --strict --online "pragmatic-engineer/tap/${name}"
-            if [ "$(brew info --json=v2 "pragmatic-engineer/tap/${name}" | jq -r '.formulae[0] | .disabled or .deprecated')" = true ]; then
+            brew audit --strict --online "amplifiedengineer/tap/${name}"
+            if [ "$(brew info --json=v2 "amplifiedengineer/tap/${name}" | jq -r '.formulae[0] | .disabled or .deprecated')" = true ]; then
               echo "${name} is disabled or deprecated, so it is audited only."
               continue
             fi
-            brew install --verbose "pragmatic-engineer/tap/${name}"
-            brew test "pragmatic-engineer/tap/${name}"
+            brew install --verbose "amplifiedengineer/tap/${name}"
+            brew test "amplifiedengineer/tap/${name}"
             if [ "$name" = pbtop ]; then
               pbtop --version
             fi
-            brew uninstall "pragmatic-engineer/tap/${name}"
+            brew uninstall "amplifiedengineer/tap/${name}"
           done

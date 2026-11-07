@@ -1,10 +1,10 @@
 # Release automation
 
-This page explains how the formulas follow releases of `pragmatic-engineer/playbook`. Do not edit the URLs or checksums in `Formula/` by hand.
+This page explains how the formulas follow releases of `amplifiedengineer/playbook`. Do not edit the URLs or checksums in `Formula/` by hand.
 
 ## Overview
 
-One `v` release of `pragmatic-engineer/playbook` ships `playbook` and `pbtop` with the same version. The `playbook` formula links `pbtop` to `playbook`, which starts the dashboard when it runs under that name. The `pbtop` formula installs the standalone binary and conflicts with `playbook`. Two paths update the formulas:
+One `v` release of `amplifiedengineer/playbook` ships `playbook` and `pbtop` with the same version. The `playbook` formula links `pbtop` to `playbook`, which starts the dashboard when it runs under that name. The `pbtop` formula installs the standalone binary and conflicts with `playbook`. Two paths update the formulas:
 
 1. The playbook release workflow opens a pull request here. This is the normal path.
 2. The `release` workflow here checks on a schedule. This is the fallback.

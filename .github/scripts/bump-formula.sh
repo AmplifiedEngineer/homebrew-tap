@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Update a formula to a release of the repo it installs from.
 # The formula name picks the release asset suffix and the default source:
-#   playbook            pragmatic-engineer/playbook, tags vX.Y.Z       raw binary
-#   pbtop               pragmatic-engineer/playbook, tags vX.Y.Z       .tar.gz holding pbtop alone
+#   playbook            amplifiedengineer/playbook, tags vX.Y.Z       raw binary
+#   pbtop               amplifiedengineer/playbook, tags vX.Y.Z       .tar.gz holding pbtop alone
 # Since playbook 0.34.0 one v release ships every tool.
 # The playbook formula also installs pbdoc, from the release's pbdoc-<version>-<target>.tar.gz
 # archives, as one resource per target next to the playbook binary. A release
@@ -14,7 +14,7 @@
 # URLs and checksums come from the release's own SHA256SUMS. Nothing is hand-edited.
 # The caveats of each formula end with one line that links the release notes of
 # the installed version, built from #{version}, so the bump writes no caveats
-# text (ADR 0037 in pragmatic-engineer/playbook).
+# text (ADR 0037 in amplifiedengineer/playbook).
 set -euo pipefail
 
 version="${1:?usage: bump-formula.sh <version> [formula-path]}"
@@ -36,7 +36,7 @@ esac
 repo="${SOURCE_REPO:-$repo}"
 prefix="${TAG_PREFIX:-$prefix}"
 tag="${prefix}${version}"
-base="https://github.com/pragmatic-engineer/${repo}/releases/download/${tag}"
+base="https://github.com/amplifiedengineer/${repo}/releases/download/${tag}"
 # DOWNLOAD_BASE reads SHA256SUMS from another place,
 # such as a file:// folder in a local test. The formula URLs keep the real base.
 fetch_base="${DOWNLOAD_BASE:-$base}"
@@ -49,12 +49,12 @@ fi
 
 write_template() {
   local zero notes
-  notes="Release notes: https://github.com/pragmatic-engineer/${repo}/releases/tag/${prefix}#{version}"
+  notes="Release notes: https://github.com/amplifiedengineer/${repo}/releases/tag/${prefix}#{version}"
   zero="$(printf '0%.0s' $(seq 1 64))"
   {
     printf 'class %s < Formula\n' "$class_name"
     printf '  desc "%s"\n' "$desc"
-    printf '  homepage "https://github.com/pragmatic-engineer/%s"\n' "$repo"
+    printf '  homepage "https://github.com/amplifiedengineer/%s"\n' "$repo"
     printf '  license "Apache-2.0"\n\n'
     printf '  livecheck do\n    url :stable\n    strategy :github_releases\n    regex(/^%sv(\\d+(?:\\.\\d+)+)$/i)\n  end\n' "${prefix%v}"
     local os t_arm t_x
@@ -172,7 +172,7 @@ mv "${tmp}.new" "$tmp"
 
 # The release notes line in the caveats follows the repo and tag prefix too,
 # so a formula that moves its source links the right release page.
-NOTES_LINE="      Release notes: https://github.com/pragmatic-engineer/${repo}/releases/tag/${prefix}#{version}" awk '
+NOTES_LINE="      Release notes: https://github.com/amplifiedengineer/${repo}/releases/tag/${prefix}#{version}" awk '
   index($0, "      Release notes: https://github.com/") == 1 { print ENVIRON["NOTES_LINE"]; next } { print }
 ' "$tmp" >"${tmp}.new"
 mv "${tmp}.new" "$tmp"
