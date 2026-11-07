@@ -60,7 +60,7 @@ brew update
 
 ## Keeping the formulas current
 
-A release of `amplifiedengineer/playbook` opens a pull request here that updates `playbook` and `pbtop` together. A scheduled workflow is the fallback. The `playbook` formula also installs `pbdoc` into the same `bin` from per-target `pbdoc-<version>-<target>.tar.gz` resources when the release lists all four. Do not edit URLs or checksums by hand. See [docs/release-automation.md](docs/release-automation.md).
+A release of `amplifiedengineer/playbook` opens a pull request here that updates `playbook` and `pbtop` together. A scheduled workflow is the fallback. The `playbook` formula also installs `pbdoc` and `pbsync` into the same `bin` from per-target `pbdoc-<version>-<target>.tar.gz` and `pbsync-<version>-<target>.tar.gz` resources when the release lists all four of each. Do not edit URLs or checksums by hand. See [docs/release-automation.md](docs/release-automation.md).
 
 ## Security
 
