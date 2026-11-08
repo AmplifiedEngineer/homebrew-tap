@@ -1,5 +1,7 @@
 # homebrew-tap
 
+> **Renamed.** The GitHub organization was `pragmatic-engineer`. It is now `amplifiedengineer`. This tap is now `amplifiedengineer/tap`. It was `pragmatic-engineer/tap`, and before that `pragmatic-engineer/playbook`. If you installed from an old tap, remove the old install and install again: run `brew uninstall playbook`, then `brew untap pragmatic-engineer/tap`, then `brew install amplifiedengineer/tap/playbook`. Add `pbtop` to the first command if you installed it. If you used the oldest tap name, untap `pragmatic-engineer/playbook` as well. Your data stays in `~/.config/playbook`. More in [Moved to the amplifiedengineer org](#moved-to-the-amplifiedengineer-org).
+
 Homebrew tap for the [amplifiedengineer/playbook](https://github.com/amplifiedengineer/playbook) toolkit.
 
 | Formula | Install | What it is |
