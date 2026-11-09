@@ -2,12 +2,13 @@
 
 > **Renamed.** The GitHub organization was `pragmatic-engineer`. It is now `amplifiedengineer`. This tap is now `amplifiedengineer/tap`. It was `pragmatic-engineer/tap`, and before that `pragmatic-engineer/playbook`. If you installed from an old tap, remove the old install and install again: run `brew uninstall playbook`, then `brew untap pragmatic-engineer/tap`, then `brew install amplifiedengineer/tap/playbook`. Add `pbtop` to the first command if you installed it. If you used the oldest tap name, untap `pragmatic-engineer/playbook` as well. Your data stays in `~/.config/playbook`. More in [Moved to the amplifiedengineer org](#moved-to-the-amplifiedengineer-org).
 
-Homebrew tap for the [amplifiedengineer/playbook](https://github.com/amplifiedengineer/playbook) toolkit.
+Homebrew tap for the [amplifiedengineer/playbook](https://github.com/amplifiedengineer/playbook) toolkit and for [Helios](https://github.com/amplifiedengineer/helios), a keyboard-first terminal client for reviewing pull requests and watching CI.
 
 | Formula | Install | What it is |
 |---|---|---|
 | `playbook` | `brew install amplifiedengineer/tap/playbook` | The Claude Code plugin toolkit and its binary. It links `pbtop` to `playbook`. |
 | `pbtop` | `brew install amplifiedengineer/tap/pbtop` | The token and cost dashboard, for a machine without `playbook`. |
+| `helios` | `brew install amplifiedengineer/tap/helios` | The Helios terminal client. The formula appears at the first Helios release. It is not installable yet. |
 
 ## Install
 
@@ -23,7 +24,7 @@ The `pbtop` formula is for a machine without `playbook`, and the two formulas co
 
 Homebrew 6.0.0 and later asks you to trust non-official taps. Installing a fully qualified name, as above, trusts only that formula.
 
-The install records that trust, so a later `brew upgrade playbook` works by short name. Without it, Homebrew stops with `Refusing to load formula ... from untrusted tap` and names the command to run. To install by short name without the full name first, run `brew tap amplifiedengineer/tap`, then `brew trust --formula amplifiedengineer/tap/playbook`. For `pbtop`, trust `amplifiedengineer/tap/pbtop`.
+The install records that trust, so a later `brew upgrade playbook` works by short name. Without it, Homebrew stops with `Refusing to load formula ... from untrusted tap` and names the command to run. To install by short name without the full name first, run `brew tap amplifiedengineer/tap`, then `brew trust --formula amplifiedengineer/tap/playbook`. For `pbtop`, trust `amplifiedengineer/tap/pbtop`. For Helios, once its formula exists, run `brew trust --formula amplifiedengineer/tap/helios`.
 
 The broader option is `brew trust amplifiedengineer/tap`. It covers every current and future formula in the tap.
 
@@ -32,6 +33,8 @@ Run `brew trust` to list what you trust. Run `brew untrust <target>` to remove a
 ## What the formulas do
 
 Each formula downloads the prebuilt binary that the `amplifiedengineer/playbook` release workflow builds, attests and checksums. It does not build from source. It uses the same `SHA256SUMS` that `install.sh` checks.
+
+The `helios` formula does the same with the archives that the Helios release workflow builds and checksums. It downloads one `helios-<version>-<target>.tar.gz` per target. Each holds the single `helios` binary. The platforms are the same four as below.
 
 Platforms: macOS (Apple Silicon and Intel) and Linux (x86_64 and arm64, static musl builds). Windows is not a Homebrew target. Use `install.sh` or WSL.
 
@@ -60,7 +63,7 @@ brew update
 
 ## Keeping the formulas current
 
-A release of `amplifiedengineer/playbook` opens a pull request here that updates `playbook` and `pbtop` together. A scheduled workflow is the fallback. The `playbook` formula also installs `pbdoc` and `pbsync` into the same `bin` from per-target `pbdoc-<version>-<target>.tar.gz` and `pbsync-<version>-<target>.tar.gz` resources when the release lists all four of each. Do not edit URLs or checksums by hand. See [docs/release-automation.md](docs/release-automation.md).
+A release of `amplifiedengineer/playbook` opens a pull request here that updates `playbook` and `pbtop` together. A scheduled workflow is the fallback. Helios has its own releases. The scheduled workflow opens a `bump/helios-v<version>` pull request for each one, and creates `Formula/helios.rb` at the first release. The `playbook` formula also installs `pbdoc` and `pbsync` into the same `bin` from per-target `pbdoc-<version>-<target>.tar.gz` and `pbsync-<version>-<target>.tar.gz` resources when the release lists all four of each. Do not edit URLs or checksums by hand. See [docs/release-automation.md](docs/release-automation.md).
 
 ## Security
 

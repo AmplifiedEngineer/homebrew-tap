@@ -93,8 +93,9 @@ jobs:
             fi
             brew install --verbose "amplifiedengineer/tap/${name}"
             brew test "amplifiedengineer/tap/${name}"
-            if [ "$name" = pbtop ]; then
-              pbtop --version
-            fi
+            case "$name" in
+              pbtop) pbtop --version ;;
+              helios) helios --version ;;
+            esac
             brew uninstall "amplifiedengineer/tap/${name}"
           done

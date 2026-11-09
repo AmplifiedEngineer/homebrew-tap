@@ -3,7 +3,9 @@
 # The formula name picks the release asset suffix and the default source:
 #   playbook            amplifiedengineer/playbook, tags vX.Y.Z       raw binary
 #   pbtop               amplifiedengineer/playbook, tags vX.Y.Z       .tar.gz holding pbtop alone
+#   helios              amplifiedengineer/helios, tags vX.Y.Z         .tar.gz holding helios alone
 # Since playbook 0.34.0 one v release ships every tool.
+# Helios has its own releases. Its asset is helios-<version>-<target>.tar.gz.
 # The playbook formula also installs pbdoc and pbsync, from the release's
 # pbdoc-<version>-<target>.tar.gz and pbsync-<version>-<target>.tar.gz archives,
 # as one resource each per target next to the playbook binary. A release with
@@ -29,6 +31,11 @@ case "$name" in
     conflicts="playbook"
     desc="Terminal dashboard of Claude Code token use and cost"
     ;;
+  helios)
+    repo="helios"; prefix="v"; suffix=".tar.gz"
+    class_name="Helios"; alias_bin=""
+    desc="Keyboard-first terminal client for reviewing pull requests and watching CI across GitHub hosts"
+    ;;
   *)
     echo "::error::no release mapping for formula '${name}'" >&2
     exit 1
@@ -49,6 +56,7 @@ if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
 fi
 
 write_template() {
+  # Writes the template to the file named by $1.
   local zero notes
   notes="Release notes: https://github.com/amplifiedengineer/${repo}/releases/tag/${prefix}#{version}"
   zero="$(printf '0%.0s' $(seq 1 64))"
@@ -90,22 +98,21 @@ write_template() {
       printf '      %s\n    EOS\n  end\n' "$notes"
       printf '\n  test do\n    assert_match version.to_s, shell_output("#{bin}/%s --version")\n  end\nend\n' "$name"
     fi
-  } >"$formula"
+  } >"$1"
 }
 
-if [[ ! -f "$formula" ]]; then
-  if [[ -z "${class_name:-}" ]]; then
-    echo "::error::${formula} does not exist and '${name}' has no template" >&2
-    exit 1
-  fi
-  write_template
+if [[ ! -f "$formula" && -z "${class_name:-}" ]]; then
+  echo "::error::${formula} does not exist and '${name}' has no template" >&2
+  exit 1
 fi
 
 sums="$(curl -fsSL --retry 3 --retry-delay 5 "${fetch_base}/SHA256SUMS")"
 
 tmp="$(mktemp)"
 trap 'rm -f "$tmp"' EXIT
-cp "$formula" "$tmp"
+# A new formula starts from the template in the temp file, so a refused
+# release leaves no file behind.
+if [[ -f "$formula" ]]; then cp "$formula" "$tmp"; else write_template "$tmp"; fi
 
 # pbdoc and pbsync are bundled only into the playbook formula, and each only
 # when the release ships its archive for every target. Some but not all is a

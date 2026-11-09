@@ -3,6 +3,8 @@
 # Releases come from amplifiedengineer/playbook:
 #   playbook            v            the raw binary
 #   pbtop               v            from the first v release that carries its archive
+# Helios has its own repo, amplifiedengineer/helios:
+#   helios              v            from the first v release that carries its archive
 # Since playbook 0.34.0 one v release ships every tool (ADR 0038 in
 # amplifiedengineer/playbook), so a v release counts for a tool only when it
 # has the tool's asset. Until a prefixed release exists in playbook, a formula
@@ -16,6 +18,7 @@ formula="${1:?usage: latest-release.sh <formula>}"
 case "$formula" in
   playbook) candidates=("playbook v -") ;;
   pbtop) candidates=("playbook v asset") ;;
+  helios) candidates=("helios v asset") ;;
   *)
     echo "::error::no release mapping for formula '${formula}'" >&2
     exit 1

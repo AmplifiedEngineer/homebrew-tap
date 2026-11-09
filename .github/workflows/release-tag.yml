@@ -3,8 +3,9 @@ name: release-tag
 # The playbook release workflow opens release/vX.Y.Z here with the formulas of
 # playbook vX.Y.Z (ADR 0039 in amplifiedengineer/playbook). When that pull
 # request merges, this workflow tags the merge commit vX.Y.Z and publishes a
-# release that lists the formula versions. Running it again keeps a tag that
-# points at the same commit and a release that exists.
+# release that lists the formula versions. A bump/<formula>-vX.Y.Z pull request
+# never matches, so a helios bump is not tagged. Running it again keeps a tag
+# that points at the same commit and a release that exists.
 on:
   pull_request:
     types: [closed]
@@ -107,6 +108,10 @@ jobs:
               # A disabled or deprecated formula no longer follows
               # the releases, so the notes leave it out.
               if grep -Eq '^  (disable|deprecate)!' "$f"; then
+                continue
+              fi
+              # helios has its own releases, so it is not part of a playbook release.
+              if [ "$name" = helios ]; then
                 continue
               fi
               version="$(sed -nE 's#.*/download/(telemetry-v|v)([0-9][0-9.]*)/.*#\2#p' "$f" | head -n1)"

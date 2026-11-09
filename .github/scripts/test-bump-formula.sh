@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Tests bump-formula.sh against release folders built here and read through
 # DOWNLOAD_BASE, so nothing touches the network. It checks the release notes
-# line in the caveats, the pbtop template
+# line in the caveats, the pbtop and helios templates
 # and latest-release.sh against a stub gh.
 # Usage: test-bump-formula.sh [--keep]
 # With --keep, Formula/pbtop.rb and a Formula/playbook.rb with pbdoc are left as a release writes it, so a style and
@@ -176,6 +176,53 @@ else
   fail "the pbtop template conflicts with playbook and ends its caveats with the release notes line"
 fi
 
+# The helios formula is written from its template at its first release.
+helios_notes='      Release notes: https://github.com/amplifiedengineer/helios/releases/tag/v#{version}'
+mkdir -p "$work/h/missing"
+helios="$work/h/helios.rb"
+dir="$(tool_release helios 9.8.0)"
+if DOWNLOAD_BASE="file://$dir" bash "$script" 9.8.0 "$helios" >/dev/null 2>"$work/err" \
+  && grep -qx 'class Helios < Formula' "$helios" \
+  && grep -qx '    bin.install "helios"' "$helios" \
+  && [[ "$(grep -c '/amplifiedengineer/helios/releases/download/v9.8.0/helios-9.8.0-[a-z0-9_-]*\.tar\.gz"' "$helios")" -eq 4 ]] \
+  && ! grep -q '0\{64\}' "$helios" \
+  && ruby -c "$helios" >/dev/null; then
+  pass "the helios formula is written from its template with four archive urls"
+else
+  fail "the helios formula is written from its template with four archive urls"
+fi
+sums_ok=1
+for t in aarch64-apple-darwin x86_64-apple-darwin aarch64-unknown-linux-musl x86_64-unknown-linux-musl; do
+  sha="$(awk -v f="helios-9.8.0-$t.tar.gz" '$2 == f { print $1 }' "$dir/SHA256SUMS")"
+  grep -A1 "helios-9.8.0-$t.tar.gz\"" "$helios" | grep -qx "      sha256 \"$sha\"" || sums_ok=0
+done
+if [[ "$sums_ok" -eq 1 ]] \
+  && grep -qxF '    regex(/^v(\d+(?:\.\d+)+)$/i)' "$helios" \
+  && [[ "$(grep -cxF "$helios_notes" "$helios")" -eq 1 ]] \
+  && ! grep -qi 'pbdoc\|pbsync\|playbook\|conflicts_with' "$helios" \
+  && grep -qF '"#{bin}/helios --version"' "$helios"; then
+  pass "the helios formula has the SUMS checksums, a livecheck regex, its own notes line and no playbook parts"
+else
+  fail "the helios formula has the SUMS checksums, a livecheck regex, its own notes line and no playbook parts"
+fi
+cp "$helios" "$work/h/first.rb"
+if DOWNLOAD_BASE="file://$dir" bash "$script" 9.8.0 "$helios" >/dev/null 2>"$work/err" \
+  && cmp -s "$helios" "$work/h/first.rb"; then
+  pass "a second helios bump of the same release changes nothing"
+else
+  fail "a second helios bump of the same release changes nothing"
+fi
+dir="$(tool_release helios 9.8.1)"
+rm -f "$dir/helios-9.8.1-x86_64-apple-darwin.tar.gz"
+(cd "$dir" && shasum -a 256 -- *.tar.gz >SHA256SUMS)
+if ! DOWNLOAD_BASE="file://$dir" bash "$script" 9.8.1 "$work/h/missing/helios.rb" >/dev/null 2>"$work/err" \
+  && grep -q 'missing or malformed checksum for x86_64-apple-darwin' "$work/err" \
+  && [[ ! -e "$work/h/missing/helios.rb" ]]; then
+  pass "a helios release missing one target archive is refused and writes no file"
+else
+  fail "a helios release missing one target archive is refused and writes no file"
+fi
+
 # latest-release.sh against a stub gh. GH_RELEASES is the release list as
 # JSON, and GH_ASSETS_<version with _> the asset names of a release.
 latest="$root/.github/scripts/latest-release.sh"
@@ -193,7 +240,9 @@ while [ "$#" -gt 0 ]; do
   esac
   shift
 done
-if [ "$repo" != amplifiedengineer/playbook ]; then
+if [ "$repo" = amplifiedengineer/helios ]; then
+  GH_RELEASES="${GH_HELIOS_RELEASES:-[]}"
+elif [ "$repo" != amplifiedengineer/playbook ]; then
   echo "GraphQL: Could not resolve to a Repository with the name '${repo}'." >&2
   exit 1
 fi
@@ -220,6 +269,18 @@ if [[ "$(lookup playbook)" = "playbook v 9.1.0" ]]; then
   pass "playbook takes the newest v release"
 else
   fail "playbook takes the newest v release"
+fi
+
+if [[ -z "$(lookup helios)" && ! -s "$work/err" ]]; then
+  pass "helios with no release yet prints nothing and succeeds"
+else
+  fail "helios with no release yet prints nothing and succeeds"
+fi
+helios_releases='[{"tagName":"v9.9.0","isDraft":false,"isPrerelease":false}]'
+if [[ "$(GH_HELIOS_RELEASES="$helios_releases" GH_ASSETS_v9_9_0="helios-9.9.0-x86_64-unknown-linux-musl.tar.gz" lookup helios)" = "helios v 9.9.0" ]]; then
+  pass "helios takes its newest v release that has its archive"
+else
+  fail "helios takes its newest v release that has its archive"
 fi
 
 if [[ "${1:-}" = "--keep" ]]; then
