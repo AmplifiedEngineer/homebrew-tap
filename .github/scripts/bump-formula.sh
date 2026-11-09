@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2016 # backticks in the caveats text are literal
 # Update a formula to a release of the repo it installs from.
 # The formula name picks the release asset suffix and the default source:
 #   playbook            amplifiedengineer/playbook, tags vX.Y.Z       raw binary
@@ -16,8 +17,11 @@
 # Usage: bump-formula.sh <version-without-v> [formula-path]
 # URLs and checksums come from the release's own SHA256SUMS. Nothing is hand-edited.
 # The caveats of each formula end with one line that links the release notes of
-# the installed version, built from #{version}, so the bump writes no caveats
-# text (ADR 0037 in amplifiedengineer/playbook).
+# the installed version, built from #{version} (ADR 0037 in amplifiedengineer/playbook).
+# This script owns the whole caveats block of the playbook formula. Every bump
+# replaces it with one copy built by playbook_caveats, or adds it when the
+# formula has none, so a hand edit to that block does not survive. The other
+# formulas keep their caveats and only get the release notes line rewritten.
 set -euo pipefail
 
 version="${1:?usage: bump-formula.sh <version> [formula-path]}"
@@ -48,12 +52,45 @@ base="https://github.com/amplifiedengineer/${repo}/releases/download/${tag}"
 # DOWNLOAD_BASE reads SHA256SUMS from another place,
 # such as a file:// folder in a local test. The formula URLs keep the real base.
 fetch_base="${DOWNLOAD_BASE:-$base}"
+# Names the playbook caveats print.
+PLUGIN_ID="playbook@amplifiedengineer"
+MARKETPLACE="amplifiedengineer/marketplace"
+# Remove LEGACY_PLUGIN_ID and its caveats line when the bump reaches 0.42.0,
+# the next minor release after 0.41.0.
+LEGACY_PLUGIN_ID="playbook-hooks@pragmatic-engineer"
 targets=(aarch64-apple-darwin x86_64-apple-darwin aarch64-unknown-linux-musl x86_64-unknown-linux-musl)
 
 if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
   echo "::error::refusing unexpected version '${version}'" >&2
   exit 1
 fi
+
+playbook_caveats() {
+  # Prints the playbook caveats block. $1 and $2 say whether pbdoc and pbsync ship (1 or 0).
+  local tools='`playbook`, `pbtop`'
+  if [[ "$1" -eq 1 && "$2" -eq 1 ]]; then tools+=', `pbdoc` and `pbsync`'
+  elif [[ "$1" -eq 1 ]]; then tools+=' and `pbdoc`'
+  elif [[ "$2" -eq 1 ]]; then tools+=' and `pbsync`'
+  else tools='`playbook` and `pbtop`'
+  fi
+  printf '  def caveats\n    <<~EOS\n'
+  printf '      This formula installs %s. `pb` is a short alias for `playbook`.\n' "$tools"
+  printf '      Run `playbook setup` once (`playbook init` on 0.34 and earlier). In a\n'
+  printf '      terminal it asks before it adds the safety hooks to ~/.claude/settings.json,\n'
+  printf '      and it puts playbook on PATH for every shell, including the ones Claude\n'
+  printf '      Code starts for hooks.\n'
+  printf '      The plugin is `%s`, from the marketplace `%s`.\n' "$PLUGIN_ID" "$MARKETPLACE"
+  printf '      If you used the old playbook-hooks plugin, run\n'
+  printf '      `claude plugin uninstall %s` first.\n' "$LEGACY_PLUGIN_ID"
+  printf '      Start sessions with `playbook cc` or `playbook ccd`. `pb cc` and `pb ccd`\n'
+  printf '      work too.\n'
+  printf '      `pbtop` is a link to `playbook` too. It opens the usage dashboard and always has\n'
+  printf '      the version of `playbook`, so `brew upgrade playbook` updates both. If the separate\n'
+  printf '      `pbtop` formula is installed, run `brew uninstall pbtop`, then `brew reinstall playbook`.\n'
+  printf '      Installing never edits your Claude Code settings. Upgrade with `brew upgrade playbook`.\n'
+  printf '      Release notes: https://github.com/amplifiedengineer/%s/releases/tag/%s#{version}\n' "$repo" "$prefix"
+  printf '    EOS\n  end\n'
+}
 
 write_template() {
   # Writes the template to the file named by $1.
@@ -189,6 +226,33 @@ LIVECHECK_RE="    regex(/^${prefix}(\\d+(?:\\.\\d+)+)\$/i)" awk '
   $1 ~ /^regex\(\/\^/ { print ENVIRON["LIVECHECK_RE"]; next } { print }
 ' "$tmp" >"${tmp}.new"
 mv "${tmp}.new" "$tmp"
+
+# Replace the playbook caveats block, or add it before the test block when the
+# formula has none. Dropping the old block and the blank line after it first
+# keeps exactly one copy and one blank line.
+if [[ "$name" = playbook ]]; then
+  caveat_pbdoc=0
+  caveat_pbsync=0
+  [[ -z "${pbdoc_shas[0]:-}" ]] || caveat_pbdoc=1
+  [[ -z "${pbsync_shas[0]:-}" ]] || caveat_pbsync=1
+  playbook_caveats "$caveat_pbdoc" "$caveat_pbsync" >"${tmp}.caveats"
+  awk -v block_file="${tmp}.caveats" '
+    $0 == "  def caveats" { skip = 1; next }
+    skip { if ($0 == "  end") { skip = 0; eat_blank = 1 } ; next }
+    eat_blank { eat_blank = 0; if ($0 == "") next }
+    $0 == "  test do" {
+      while ((getline line < block_file) > 0) print line
+      print ""
+    }
+    { print }
+  ' "$tmp" >"${tmp}.new"
+  rm -f "${tmp}.caveats"
+  mv "${tmp}.new" "$tmp"
+  if [[ "$(grep -c '^  def caveats$' "$tmp")" -ne 1 ]]; then
+    echo "::error::expected one caveats block after the rewrite. The formula layout changed. Refusing to write." >&2
+    exit 1
+  fi
+fi
 
 # The release notes line in the caveats follows the repo and tag prefix too,
 # so a formula that moves its source links the right release page.
