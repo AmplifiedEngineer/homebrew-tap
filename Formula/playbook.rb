@@ -17,20 +17,12 @@ class Playbook < Formula
         url "https://github.com/amplifiedengineer/playbook/releases/download/v0.41.0/pbdoc-0.41.0-aarch64-apple-darwin.tar.gz"
         sha256 "c0b90bfa20da96a64c9bd858067647ac62f7ebd245c75411c5b4fc6e949de9dc"
       end
-      resource "pbsync" do
-        url "https://github.com/amplifiedengineer/playbook/releases/download/v0.41.0/pbsync-0.41.0-aarch64-apple-darwin.tar.gz"
-        sha256 "0000000000000000000000000000000000000000000000000000000000000000"
-      end
     else
       url "https://github.com/amplifiedengineer/playbook/releases/download/v0.41.0/playbook-0.41.0-x86_64-apple-darwin"
       sha256 "3e07ad5cbfe20ce7ce290b6eb5c11b6e8f3a9852d6b7067f7d6d9804d7ebadf2"
       resource "pbdoc" do
         url "https://github.com/amplifiedengineer/playbook/releases/download/v0.41.0/pbdoc-0.41.0-x86_64-apple-darwin.tar.gz"
         sha256 "a7b32ad8cc228b660e34d93b7e5e97a9a86ae36143fc1401a44f612a444935e2"
-      end
-      resource "pbsync" do
-        url "https://github.com/amplifiedengineer/playbook/releases/download/v0.41.0/pbsync-0.41.0-x86_64-apple-darwin.tar.gz"
-        sha256 "0000000000000000000000000000000000000000000000000000000000000000"
       end
     end
   end
@@ -43,20 +35,12 @@ class Playbook < Formula
         url "https://github.com/amplifiedengineer/playbook/releases/download/v0.41.0/pbdoc-0.41.0-aarch64-unknown-linux-musl.tar.gz"
         sha256 "0b32ee06a2d9f37936d8c2b75e441711752c6564216ca3a6461024da4d13ee34"
       end
-      resource "pbsync" do
-        url "https://github.com/amplifiedengineer/playbook/releases/download/v0.41.0/pbsync-0.41.0-aarch64-unknown-linux-musl.tar.gz"
-        sha256 "0000000000000000000000000000000000000000000000000000000000000000"
-      end
     else
       url "https://github.com/amplifiedengineer/playbook/releases/download/v0.41.0/playbook-0.41.0-x86_64-unknown-linux-musl"
       sha256 "d05329ff82acc60e76e4606d2211f22019045db96b6f3cc740c3ba48b924e392"
       resource "pbdoc" do
         url "https://github.com/amplifiedengineer/playbook/releases/download/v0.41.0/pbdoc-0.41.0-x86_64-unknown-linux-musl.tar.gz"
         sha256 "d70f24e6eb8b2c7d07e5cb864439672ac1b353e755818d4da92ac0876afa629d"
-      end
-      resource "pbsync" do
-        url "https://github.com/amplifiedengineer/playbook/releases/download/v0.41.0/pbsync-0.41.0-x86_64-unknown-linux-musl.tar.gz"
-        sha256 "0000000000000000000000000000000000000000000000000000000000000000"
       end
     end
   end
@@ -71,9 +55,6 @@ class Playbook < Formula
     resource("pbdoc").stage do
       bin.install "pbdoc"
       doc.install "NOTICE-pbdoc"
-    end
-    resource("pbsync").stage do
-      bin.install "pbsync"
     end
   end
 
@@ -90,8 +71,6 @@ class Playbook < Formula
       `pbtop` is a link to `playbook` too. It opens the usage dashboard and always has
       the version of `playbook`, so `brew upgrade playbook` updates both. If the separate
       `pbtop` formula is installed, run `brew uninstall pbtop`, then `brew reinstall playbook`.
-      `pbsync` is installed next to `playbook`. It is the opt-in usage sync helper
-      and does nothing until you turn sync on.
       Installing never edits your Claude Code settings. Upgrade with `brew upgrade playbook`.
       Release notes: https://github.com/amplifiedengineer/playbook/releases/tag/v#{version}
     EOS
@@ -102,6 +81,5 @@ class Playbook < Formula
     assert_match "pbtop #{version}", shell_output("#{bin}/pbtop --version")
     assert_match version.to_s, shell_output("#{bin}/pb --version")
     assert_match version.to_s, shell_output("#{bin}/pbdoc --version")
-    assert_match version.to_s, shell_output("#{bin}/pbsync --version")
   end
 end
