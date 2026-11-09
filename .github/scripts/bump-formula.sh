@@ -4,9 +4,10 @@
 #   playbook            amplifiedengineer/playbook, tags vX.Y.Z       raw binary
 #   pbtop               amplifiedengineer/playbook, tags vX.Y.Z       .tar.gz holding pbtop alone
 # Since playbook 0.34.0 one v release ships every tool.
-# The playbook formula also installs pbdoc, from the release's pbdoc-<version>-<target>.tar.gz
-# archives, as one resource per target next to the playbook binary. A release
-# with no pbdoc archive (older versions) gets a formula without the resource.
+# The playbook formula also installs pbdoc and pbsync, from the release's
+# pbdoc-<version>-<target>.tar.gz and pbsync-<version>-<target>.tar.gz archives,
+# as one resource each per target next to the playbook binary. A release with
+# no archive of a tool (older versions) gets a formula without that resource.
 # SOURCE_REPO and TAG_PREFIX override the source (latest-release.sh prints them),
 # which lets a formula keep following a legacy repo until its first prefixed tag.
 # A tool formula that does not exist yet is created from a template at its first release.
@@ -106,33 +107,39 @@ tmp="$(mktemp)"
 trap 'rm -f "$tmp"' EXIT
 cp "$formula" "$tmp"
 
-# pbdoc is bundled only into the playbook formula, and only when the release
-# ships its archive for every target. Some but not all is a broken release.
+# pbdoc and pbsync are bundled only into the playbook formula, and each only
+# when the release ships its archive for every target. Some but not all is a
+# broken release. A release with neither (older versions) gets neither.
 pbdoc_shas=()
+pbsync_shas=()
 if [[ "$name" = playbook ]]; then
-  for target in "${targets[@]}"; do
-    pbdoc_shas+=("$(awk -v f="pbdoc-${version}-${target}.tar.gz" '$2 == f { print $1 }' <<<"$sums")")
-  done
-  found=0
-  for sha in "${pbdoc_shas[@]}"; do
-    [[ -z "$sha" ]] && continue
-    found=$((found + 1))
-    if [[ ! "$sha" =~ ^[0-9a-f]{64}$ ]]; then
-      echo "::error::malformed pbdoc checksum in ${tag} SHA256SUMS. Refusing to write a partial formula." >&2
+  for tool in pbdoc pbsync; do
+    shas=()
+    for target in "${targets[@]}"; do
+      shas+=("$(awk -v f="${tool}-${version}-${target}.tar.gz" '$2 == f { print $1 }' <<<"$sums")")
+    done
+    found=0
+    for sha in "${shas[@]}"; do
+      [[ -z "$sha" ]] && continue
+      found=$((found + 1))
+      if [[ ! "$sha" =~ ^[0-9a-f]{64}$ ]]; then
+        echo "::error::malformed ${tool} checksum in ${tag} SHA256SUMS. Refusing to write a partial formula." >&2
+        exit 1
+      fi
+    done
+    if [[ "$found" -ne 0 && "$found" -ne ${#targets[@]} ]]; then
+      echo "::error::${tag} SHA256SUMS has ${tool} checksums for ${found} of ${#targets[@]} targets. Refusing to write a partial formula." >&2
       exit 1
     fi
+    if [[ "$tool" = pbdoc ]]; then pbdoc_shas=("${shas[@]}"); else pbsync_shas=("${shas[@]}"); fi
   done
-  if [[ "$found" -ne 0 && "$found" -ne ${#targets[@]} ]]; then
-    echo "::error::${tag} SHA256SUMS has pbdoc checksums for ${found} of ${#targets[@]} targets. Refusing to write a partial formula." >&2
-    exit 1
-  fi
-  # Drop the pbdoc parts first, so a re-run on any release leaves one clean copy.
+  # Drop the helper parts first, so a re-run on any release leaves one clean copy.
   awk '
-    $0 == "      resource \"pbdoc\" do" { skip = 1; next }
+    $0 == "      resource \"pbdoc\" do" || $0 == "      resource \"pbsync\" do" { skip = 1; next }
     skip { if ($0 == "      end") skip = 0; next }
-    $0 == "    resource(\"pbdoc\").stage do" { skip_install = 1; next }
+    $0 == "    resource(\"pbdoc\").stage do" || $0 == "    resource(\"pbsync\").stage do" { skip_install = 1; next }
     skip_install { if ($0 == "    end") skip_install = 0; next }
-    index($0, "/pbdoc --version") { next }
+    index($0, "/pbdoc --version") || index($0, "/pbsync --version") { next }
     { print }
   ' "$tmp" >"${tmp}.new"
   mv "${tmp}.new" "$tmp"
@@ -141,6 +148,7 @@ fi
 for i in "${!targets[@]}"; do
   target="${targets[$i]}"
   pbdoc_sha="${pbdoc_shas[$i]:-}"
+  pbsync_sha="${pbsync_shas[$i]:-}"
   sha="$(awk -v f="${name}-${version}-${target}${suffix}" '$2 == f { print $1 }' <<<"$sums")"
   if [[ ! "$sha" =~ ^[0-9a-f]{64}$ ]]; then
     echo "::error::missing or malformed checksum for ${target} in ${tag} SHA256SUMS. Refusing to write a partial formula." >&2
@@ -148,13 +156,18 @@ for i in "${!targets[@]}"; do
   fi
   # Rewrite the url line for this target, and the sha256 line that follows it.
   awk -v target="$target" -v suffix="$suffix" -v url="      url \"${base}/${name}-${version}-${target}${suffix}\"" -v sha="      sha256 \"${sha}\"" \
-    -v pbdoc_url="        url \"${base}/pbdoc-${version}-${target}.tar.gz\"" -v pbdoc_sha="${pbdoc_sha}" '
+    -v pbdoc_url="        url \"${base}/pbdoc-${version}-${target}.tar.gz\"" -v pbdoc_sha="${pbdoc_sha}" \
+    -v pbsync_url="        url \"${base}/pbsync-${version}-${target}.tar.gz\"" -v pbsync_sha="${pbsync_sha}" '
     $1 == "url" && index($0, "-" target suffix "\"") { print url; fix = 1; next }
     fix && $1 == "sha256" {
       print sha; fix = 0
       if (pbdoc_sha != "") {
         print "      resource \"pbdoc\" do"; print pbdoc_url
         print "        sha256 \"" pbdoc_sha "\""; print "      end"
+      }
+      if (pbsync_sha != "") {
+        print "      resource \"pbsync\" do"; print pbsync_url
+        print "        sha256 \"" pbsync_sha "\""; print "      end"
       }
       next
     }
@@ -183,26 +196,42 @@ if [[ "$rewritten" -ne ${#targets[@]} ]]; then
   exit 1
 fi
 
-if [[ -n "${pbdoc_shas[0]:-}" ]]; then
-  # Install pbdoc beside playbook: playbook finds it next to its own executable.
-  awk '
+if [[ -n "${pbdoc_shas[0]:-}" || -n "${pbsync_shas[0]:-}" ]]; then
+  # Install the helpers beside playbook: playbook finds them next to its own executable.
+  has_pbdoc=0
+  has_pbsync=0
+  [[ -z "${pbdoc_shas[0]:-}" ]] || has_pbdoc=1
+  [[ -z "${pbsync_shas[0]:-}" ]] || has_pbsync=1
+  awk -v has_pbdoc="$has_pbdoc" -v has_pbsync="$has_pbsync" '
     { print }
     index($0, "bin.install_symlink \"playbook\" => \"pb\"") {
-      print "    resource(\"pbdoc\").stage do"
-      print "      bin.install \"pbdoc\""
-      print "      doc.install \"NOTICE-pbdoc\""
-      print "    end"
+      if (has_pbdoc) {
+        print "    resource(\"pbdoc\").stage do"
+        print "      bin.install \"pbdoc\""
+        print "      doc.install \"NOTICE-pbdoc\""
+        print "    end"
+      }
+      if (has_pbsync) {
+        print "    resource(\"pbsync\").stage do"
+        print "      bin.install \"pbsync\""
+        print "    end"
+      }
     }
     index($0, "/pb --version") {
-      print "    assert_match version.to_s, shell_output(\"#{bin}/pbdoc --version\")"
+      if (has_pbdoc) print "    assert_match version.to_s, shell_output(\"#{bin}/pbdoc --version\")"
+      if (has_pbsync) print "    assert_match version.to_s, shell_output(\"#{bin}/pbsync --version\")"
     }
   ' "$tmp" >"${tmp}.new"
   mv "${tmp}.new" "$tmp"
-  pbdoc_count="$(grep -c "/download/${tag}/pbdoc-${version}-" "$tmp" || true)"
-  if [[ "$pbdoc_count" -ne ${#targets[@]} ]] || ! grep -qxF '      bin.install "pbdoc"' "$tmp"; then
-    echo "::error::expected ${#targets[@]} pbdoc resources and an install step for ${tag}, found ${pbdoc_count}. The formula layout changed. Refusing to write." >&2
-    exit 1
-  fi
+  for tool in pbdoc pbsync; do
+    if [[ "$tool" = pbdoc ]]; then want="$has_pbdoc"; else want="$has_pbsync"; fi
+    [[ "$want" -eq 1 ]] || continue
+    tool_count="$(grep -c "/download/${tag}/${tool}-${version}-" "$tmp" || true)"
+    if [[ "$tool_count" -ne ${#targets[@]} ]] || ! grep -qxF "      bin.install \"${tool}\"" "$tmp"; then
+      echo "::error::expected ${#targets[@]} ${tool} resources and an install step for ${tag}, found ${tool_count}. The formula layout changed. Refusing to write." >&2
+      exit 1
+    fi
+  done
 fi
 
 cp "$tmp" "$formula"

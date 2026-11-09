@@ -56,17 +56,19 @@ else
   fail "a bump rewrites the release notes line to the current repo and prefix"
 fi
 
-# pbdoc_release VERSION [SKIP_TARGET]: a release folder with the playbook
-# binaries and the pbdoc archives, leaving out one pbdoc target when given.
+# pbdoc_release VERSION [SKIP_TARGET] [TOOL]: a release folder with the playbook
+# binaries and the pbdoc and pbsync archives, leaving out one target of TOOL
+# (pbdoc by default) when given.
 pbdoc_release() {
   local dir="$work/pbdoc-$1" t
   rm -rf "$dir"
   mkdir -p "$dir"
   for t in aarch64-apple-darwin x86_64-apple-darwin aarch64-unknown-linux-musl x86_64-unknown-linux-musl; do
     printf 'bin %s\n' "$t" >"$dir/playbook-$1-$t"
-    [[ "$t" = "${2:-}" ]] || printf 'pbdoc %s\n' "$t" >"$dir/pbdoc-$1-$t.tar.gz"
+    [[ "$t" = "${2:-}" && "${3:-pbdoc}" = pbdoc ]] || printf 'pbdoc %s\n' "$t" >"$dir/pbdoc-$1-$t.tar.gz"
+    [[ "$t" = "${2:-}" && "${3:-pbdoc}" = pbsync ]] || printf 'pbsync %s\n' "$t" >"$dir/pbsync-$1-$t.tar.gz"
   done
-  (cd "$dir" && shasum -a 256 playbook-* pbdoc-* >SHA256SUMS)
+  (cd "$dir" && shasum -a 256 playbook-* pbdoc-* pbsync-* >SHA256SUMS)
   printf '%s' "$dir"
 }
 
@@ -79,9 +81,13 @@ if DOWNLOAD_BASE="file://$dir" bash "$script" 9.2.0 "$pbf" >/dev/null 2>"$work/e
   && [[ "$(grep -c '/download/v9.2.0/pbdoc-9.2.0-.*\.tar\.gz"' "$pbf")" -eq 4 ]] \
   && [[ "$(grep -c '/download/v9.2.0/playbook-9.2.0-' "$pbf")" -eq 4 ]] \
   && grep -qx '      bin.install "pbdoc"' "$pbf" \
+  && [[ "$(grep -c 'resource "pbsync" do' "$pbf")" -eq 4 ]] \
+  && [[ "$(grep -c '/download/v9.2.0/pbsync-9.2.0-.*\.tar\.gz"' "$pbf")" -eq 4 ]] \
+  && grep -qx '      bin.install "pbsync"' "$pbf" \
+  && grep -qF '"#{bin}/pbsync --version"' "$pbf" \
   && ! grep -q '0\{64\}' "$pbf" \
   && ruby -c "$pbf" >/dev/null; then
-  pass "a bump with pbdoc archives writes one pbdoc resource per target and installs it"
+  pass "a bump with pbdoc archives writes one pbdoc and one pbsync resource per target and installs them"
 else
   fail "a bump with pbdoc archives writes one pbdoc resource per target and installs it"
 fi
@@ -107,11 +113,12 @@ fi
 dir="$(release 9.3.0)"
 if DOWNLOAD_BASE="file://$dir" bash "$script" 9.3.0 "$pbf" >/dev/null 2>"$work/err" \
   && ! grep -q 'pbdoc' "$pbf" \
+  && ! grep -q 'resource.*pbsync\|pbsync --version' "$pbf" \
   && [[ "$(grep -c '/download/v9.3.0/playbook-9.3.0-' "$pbf")" -eq 4 ]] \
   && ruby -c "$pbf" >/dev/null; then
-  pass "a bump to a release without pbdoc removes the pbdoc parts"
+  pass "a bump to a release without pbdoc removes the pbdoc and pbsync parts"
 else
-  fail "a bump to a release without pbdoc removes the pbdoc parts"
+  fail "a bump to a release without pbdoc removes the pbdoc and pbsync parts"
 fi
 
 mkdir -p "$work/b/partial"
@@ -123,6 +130,17 @@ if ! DOWNLOAD_BASE="file://$dir" bash "$script" 9.4.0 "$work/b/partial/playbook.
   pass "a release with pbdoc for only some targets is refused and the formula is unchanged"
 else
   fail "a release with pbdoc for only some targets is refused and the formula is unchanged"
+fi
+
+mkdir -p "$work/b/partial-sync"
+cp "$root/Formula/playbook.rb" "$work/b/partial-sync/playbook.rb"
+dir="$(pbdoc_release 9.4.1 x86_64-unknown-linux-musl pbsync)"
+if ! DOWNLOAD_BASE="file://$dir" bash "$script" 9.4.1 "$work/b/partial-sync/playbook.rb" >/dev/null 2>"$work/err" \
+  && grep -q 'pbsync checksums for 3 of 4' "$work/err" \
+  && cmp -s "$root/Formula/playbook.rb" "$work/b/partial-sync/playbook.rb"; then
+  pass "a release with pbsync for only some targets is refused and the formula is unchanged"
+else
+  fail "a release with pbsync for only some targets is refused and the formula is unchanged"
 fi
 
 # tool_release NAME VERSION: a release folder with the archives of one tool.
