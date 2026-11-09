@@ -60,14 +60,16 @@ class Playbook < Formula
 
   def caveats
     <<~EOS
+      This formula installs `playbook`, `pbtop` and `pbdoc`. `pb` is a short alias for `playbook`.
       Run `playbook setup` once (`playbook init` on 0.34 and earlier). In a
       terminal it asks before it adds the safety hooks to ~/.claude/settings.json,
       and it puts playbook on PATH for every shell, including the ones Claude
       Code starts for hooks.
+      The plugin is `playbook@amplifiedengineer`, from the marketplace `amplifiedengineer/marketplace`.
       If you used the old playbook-hooks plugin, run
       `claude plugin uninstall playbook-hooks@pragmatic-engineer` first.
-      Start sessions with `playbook cc` or `playbook ccd`. `pb` is a short alias,
-      so `pb cc` and `pb ccd` work too.
+      Start sessions with `playbook cc` or `playbook ccd`. `pb cc` and `pb ccd`
+      work too.
       `pbtop` is a link to `playbook` too. It opens the usage dashboard and always has
       the version of `playbook`, so `brew upgrade playbook` updates both. If the separate
       `pbtop` formula is installed, run `brew uninstall pbtop`, then `brew reinstall playbook`.

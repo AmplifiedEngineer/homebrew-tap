@@ -65,7 +65,11 @@ The `helios` formula test runs `helios --version`, so Helios must support that f
 
 ## Caveats text
 
-The caveats of each formula end with one line that links the release notes of the installed version. It is built from `#{version}`. The bump writes no caveats text.
+The caveats of each formula end with one line that links the release notes of the installed version. It is built from `#{version}`.
+
+`bump-formula.sh` owns the whole caveats block of the `playbook` formula. Every bump replaces the block with one copy from the `playbook_caveats` function in that script, or adds the block when the formula has none. A hand edit to `Formula/playbook.rb` caveats does not survive the next bump, so change the text in the script and its tests instead. The block names the binaries the release installs (`pbdoc` and `pbsync` only when the release ships them), the `playbook setup` command, the plugin `playbook@amplifiedengineer` and the marketplace `amplifiedengineer/marketplace`. It keeps the uninstall line for `playbook-hooks@pragmatic-engineer` until the bump to 0.42.0, the next minor release, and the script comment marks the line to remove then.
+
+The `pbtop` and `helios` formulas get their caveats from their templates at the first release. Later bumps keep that text and rewrite only the release notes line.
 
 ## Tests
 

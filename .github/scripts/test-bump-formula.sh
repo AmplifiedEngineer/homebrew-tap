@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2016 # backticks in the caveats text are literal
 # Tests bump-formula.sh against release folders built here and read through
 # DOWNLOAD_BASE, so nothing touches the network. It checks the release notes
 # line in the caveats, the pbtop and helios templates
@@ -110,10 +111,64 @@ if DOWNLOAD_BASE="file://$dir" bash "$script" 9.2.0 "$pbf" >/dev/null 2>"$work/e
 else
   fail "a second bump of the same release changes nothing"
 fi
+# The playbook caveats block is owned by the script. Each case checks it holds
+# exactly one block with the binaries, the setup command, the plugin id, the
+# marketplace and the legacy uninstall line.
+caveat_block() { awk '$0 == "  def caveats" { on = 1 } on { print } on && $0 == "  end" { on = 0 }' "$1"; }
+caveats_ok() {
+  local f="$1" block
+  block="$(caveat_block "$f")"
+  [[ "$(grep -c '^  def caveats$' "$f")" -eq 1 ]] \
+    && grep -qF 'installs `playbook`, `pbtop`, `pbdoc` and `pbsync`.' <<<"$block" \
+    && grep -qF 'Run `playbook setup` once' <<<"$block" \
+    && grep -qF '`playbook@amplifiedengineer`' <<<"$block" \
+    && grep -qF '`amplifiedengineer/marketplace`' <<<"$block" \
+    && grep -qF '`claude plugin uninstall playbook-hooks@pragmatic-engineer`' <<<"$block" \
+    && [[ "$(grep -cxF "$notes" "$f")" -eq 1 ]] \
+    && ruby -c "$f" >/dev/null
+}
+if caveats_ok "$pbf"; then
+  pass "a bump of an existing formula writes one caveats block with the binaries, plugin, marketplace and legacy line"
+else
+  fail "a bump of an existing formula writes one caveats block with the binaries, plugin, marketplace and legacy line"
+fi
+if DOWNLOAD_BASE="file://$dir" bash "$script" 9.2.0 "$pbf" >/dev/null 2>"$work/err" \
+  && DOWNLOAD_BASE="file://$dir" bash "$script" 9.2.0 "$pbf" >/dev/null 2>"$work/err" \
+  && cmp -s "$pbf" "$work/b/first.rb" \
+  && caveats_ok "$pbf"; then
+  pass "bumping twice keeps one identical caveats block"
+else
+  fail "bumping twice keeps one identical caveats block"
+fi
+mkdir -p "$work/b/nocaveats" "$work/b/drift"
+awk '$0 == "  def caveats" { skip = 1 } !skip { print } skip && $0 == "  end" { skip = 0; getline }' "$work/b/first.rb" >"$work/b/nocaveats/playbook.rb"
+if ! grep -q 'def caveats' "$work/b/nocaveats/playbook.rb" \
+  && DOWNLOAD_BASE="file://$dir" bash "$script" 9.2.0 "$work/b/nocaveats/playbook.rb" >/dev/null 2>"$work/err" \
+  && cmp -s "$work/b/nocaveats/playbook.rb" "$work/b/first.rb" \
+  && caveats_ok "$work/b/nocaveats/playbook.rb"; then
+  pass "a formula without a caveats block gets the block, placed before the test block"
+else
+  fail "a formula without a caveats block gets the block, placed before the test block"
+fi
+awk '
+  $0 == "  def caveats" { print "  def caveats"; print "    \"hand edit\""; print "  end"; print "" }
+  { print }
+' "$work/b/first.rb" >"$work/b/drift/playbook.rb"
+if grep -q 'hand edit' "$work/b/drift/playbook.rb" \
+  && DOWNLOAD_BASE="file://$dir" bash "$script" 9.2.0 "$work/b/drift/playbook.rb" >/dev/null 2>"$work/err" \
+  && ! grep -q 'hand edit' "$work/b/drift/playbook.rb" \
+  && cmp -s "$work/b/drift/playbook.rb" "$work/b/first.rb"; then
+  pass "a hand edited or duplicated caveats block is rewritten to one canonical block"
+else
+  fail "a hand edited or duplicated caveats block is rewritten to one canonical block"
+fi
+
 dir="$(release 9.3.0)"
 if DOWNLOAD_BASE="file://$dir" bash "$script" 9.3.0 "$pbf" >/dev/null 2>"$work/err" \
   && ! grep -q 'pbdoc' "$pbf" \
   && ! grep -q 'resource.*pbsync\|pbsync --version' "$pbf" \
+  && grep -qF 'installs `playbook` and `pbtop`.' "$pbf" \
+  && [[ "$(grep -c '^  def caveats$' "$pbf")" -eq 1 ]] \
   && [[ "$(grep -c '/download/v9.3.0/playbook-9.3.0-' "$pbf")" -eq 4 ]] \
   && ruby -c "$pbf" >/dev/null; then
   pass "a bump to a release without pbdoc removes the pbdoc and pbsync parts"
