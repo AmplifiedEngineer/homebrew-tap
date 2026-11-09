@@ -11,36 +11,52 @@ class Playbook < Formula
 
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/amplifiedengineer/playbook/releases/download/v0.41.0/playbook-0.41.0-aarch64-apple-darwin"
-      sha256 "99ccd6855b981e68ce3a28d2faa899cf18556c3612368d92c527dd8b3168f2b0"
+      url "https://github.com/amplifiedengineer/playbook/releases/download/v0.42.0/playbook-0.42.0-aarch64-apple-darwin"
+      sha256 "600e39e398e3da732ad336a17a0a253c5d7b53876f679db212cfd6a1a81630e7"
       resource "pbdoc" do
-        url "https://github.com/amplifiedengineer/playbook/releases/download/v0.41.0/pbdoc-0.41.0-aarch64-apple-darwin.tar.gz"
-        sha256 "c0b90bfa20da96a64c9bd858067647ac62f7ebd245c75411c5b4fc6e949de9dc"
+        url "https://github.com/amplifiedengineer/playbook/releases/download/v0.42.0/pbdoc-0.42.0-aarch64-apple-darwin.tar.gz"
+        sha256 "b7a8e126e669c61d0237235ec17b0aaa21c283e801ae0bfdc1942d068695c437"
+      end
+      resource "pbsync" do
+        url "https://github.com/amplifiedengineer/playbook/releases/download/v0.42.0/pbsync-0.42.0-aarch64-apple-darwin.tar.gz"
+        sha256 "377b5354436e1f6041795c69961cd99ba5f411a361006beece14b43f479fcbca"
       end
     else
-      url "https://github.com/amplifiedengineer/playbook/releases/download/v0.41.0/playbook-0.41.0-x86_64-apple-darwin"
-      sha256 "3e07ad5cbfe20ce7ce290b6eb5c11b6e8f3a9852d6b7067f7d6d9804d7ebadf2"
+      url "https://github.com/amplifiedengineer/playbook/releases/download/v0.42.0/playbook-0.42.0-x86_64-apple-darwin"
+      sha256 "73b272bbf41a9184645c319566fa8d08419fa5f4bd0274335f2218c242ba10a6"
       resource "pbdoc" do
-        url "https://github.com/amplifiedengineer/playbook/releases/download/v0.41.0/pbdoc-0.41.0-x86_64-apple-darwin.tar.gz"
-        sha256 "a7b32ad8cc228b660e34d93b7e5e97a9a86ae36143fc1401a44f612a444935e2"
+        url "https://github.com/amplifiedengineer/playbook/releases/download/v0.42.0/pbdoc-0.42.0-x86_64-apple-darwin.tar.gz"
+        sha256 "dbace89bf32364c4fc899b041b68c8347a087f8f39794772aa3faef933ffd39a"
+      end
+      resource "pbsync" do
+        url "https://github.com/amplifiedengineer/playbook/releases/download/v0.42.0/pbsync-0.42.0-x86_64-apple-darwin.tar.gz"
+        sha256 "5f3f77060d4850a14b174cc0f01c76fd344f0bce5413dfb8e3e4109f0a5d2a0e"
       end
     end
   end
 
   on_linux do
     if Hardware::CPU.arm?
-      url "https://github.com/amplifiedengineer/playbook/releases/download/v0.41.0/playbook-0.41.0-aarch64-unknown-linux-musl"
-      sha256 "f4457a8060ff222e3821224a6d1108922fdfa33bc5f744eadfbc3cc985e3b658"
+      url "https://github.com/amplifiedengineer/playbook/releases/download/v0.42.0/playbook-0.42.0-aarch64-unknown-linux-musl"
+      sha256 "cef5a5951f9e14efc4aaa9b6eb6bb058f4d04934d919c2ec1307a1e0a4bacad4"
       resource "pbdoc" do
-        url "https://github.com/amplifiedengineer/playbook/releases/download/v0.41.0/pbdoc-0.41.0-aarch64-unknown-linux-musl.tar.gz"
-        sha256 "0b32ee06a2d9f37936d8c2b75e441711752c6564216ca3a6461024da4d13ee34"
+        url "https://github.com/amplifiedengineer/playbook/releases/download/v0.42.0/pbdoc-0.42.0-aarch64-unknown-linux-musl.tar.gz"
+        sha256 "f94762523b0974b9375af4af463800272b1053d3227a02074c87eb27dd41489e"
+      end
+      resource "pbsync" do
+        url "https://github.com/amplifiedengineer/playbook/releases/download/v0.42.0/pbsync-0.42.0-aarch64-unknown-linux-musl.tar.gz"
+        sha256 "7f1a14269ac783ceb54a31f119d56626a63af3dac2b688dcf0eb35aa6e22878e"
       end
     else
-      url "https://github.com/amplifiedengineer/playbook/releases/download/v0.41.0/playbook-0.41.0-x86_64-unknown-linux-musl"
-      sha256 "d05329ff82acc60e76e4606d2211f22019045db96b6f3cc740c3ba48b924e392"
+      url "https://github.com/amplifiedengineer/playbook/releases/download/v0.42.0/playbook-0.42.0-x86_64-unknown-linux-musl"
+      sha256 "49e023cab880e39ebcbbd254f0f6902a16823a6b98706112148ec803f82f10d5"
       resource "pbdoc" do
-        url "https://github.com/amplifiedengineer/playbook/releases/download/v0.41.0/pbdoc-0.41.0-x86_64-unknown-linux-musl.tar.gz"
-        sha256 "d70f24e6eb8b2c7d07e5cb864439672ac1b353e755818d4da92ac0876afa629d"
+        url "https://github.com/amplifiedengineer/playbook/releases/download/v0.42.0/pbdoc-0.42.0-x86_64-unknown-linux-musl.tar.gz"
+        sha256 "748bc8ca0636e2dc27d141efd3d51f2bbd5588d0d349603a0510107cc4bddf93"
+      end
+      resource "pbsync" do
+        url "https://github.com/amplifiedengineer/playbook/releases/download/v0.42.0/pbsync-0.42.0-x86_64-unknown-linux-musl.tar.gz"
+        sha256 "b36a224d0d336e42b044b13158b4029745391063c2c6b1a5fab260442479ee16"
       end
     end
   end
@@ -56,11 +72,14 @@ class Playbook < Formula
       bin.install "pbdoc"
       doc.install "NOTICE-pbdoc"
     end
+    resource("pbsync").stage do
+      bin.install "pbsync"
+    end
   end
 
   def caveats
     <<~EOS
-      This formula installs `playbook`, `pbtop` and `pbdoc`. `pb` is a short alias for `playbook`.
+      This formula installs `playbook`, `pbtop`, `pbdoc` and `pbsync`. `pb` is a short alias for `playbook`.
       Run `playbook setup` once (`playbook init` on 0.34 and earlier). In a
       terminal it asks before it adds the safety hooks to ~/.claude/settings.json,
       and it puts playbook on PATH for every shell, including the ones Claude
@@ -83,5 +102,6 @@ class Playbook < Formula
     assert_match "pbtop #{version}", shell_output("#{bin}/pbtop --version")
     assert_match version.to_s, shell_output("#{bin}/pb --version")
     assert_match version.to_s, shell_output("#{bin}/pbdoc --version")
+    assert_match version.to_s, shell_output("#{bin}/pbsync --version")
   end
 end
