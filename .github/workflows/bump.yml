@@ -17,7 +17,9 @@ jobs:
       max-parallel: 1
       fail-fast: false
       matrix:
-        formula: [playbook, pbtop]
+        # helios follows its own releases and is never part of a playbook
+        # release pull request, so it takes the bump branch path below.
+        formula: [playbook, pbtop, helios]
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
