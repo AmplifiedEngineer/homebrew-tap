@@ -67,14 +67,20 @@ fi
 
 playbook_caveats() {
   # Prints the playbook caveats block. $1 and $2 say whether pbdoc and pbsync ship (1 or 0).
-  local tools='`playbook`, `pbtop`'
-  if [[ "$1" -eq 1 && "$2" -eq 1 ]]; then tools+=', `pbdoc` and `pbsync`'
-  elif [[ "$1" -eq 1 ]]; then tools+=' and `pbdoc`'
-  elif [[ "$2" -eq 1 ]]; then tools+=' and `pbsync`'
-  else tools='`playbook` and `pbtop`'
+  local helpers=''
+  if [[ "$1" -eq 1 && "$2" -eq 1 ]]; then helpers='the helpers `pbdoc` and `pbsync`'
+  elif [[ "$1" -eq 1 ]]; then helpers='the helper `pbdoc`'
+  elif [[ "$2" -eq 1 ]]; then helpers='the helper `pbsync`'
   fi
   printf '  def caveats\n    <<~EOS\n'
-  printf '      This formula installs %s. `pb` is a short alias for `playbook`.\n' "$tools"
+  printf '      This formula installs the `playbook` and `pbtop` commands. `pb` is a short\n'
+  printf '      alias for `playbook`.\n'
+  if [[ -n "$helpers" ]]; then
+    printf '      It also installs %s, which `playbook` calls for you.\n' "$helpers"
+  fi
+  if [[ "$2" -eq 1 ]]; then
+    printf '      Usage sync is off until you run `playbook sync enable`.\n'
+  fi
   printf '      Run `playbook setup` once (`playbook init` on 0.34 and earlier). In a\n'
   printf '      terminal it asks before it adds the safety hooks to ~/.claude/settings.json,\n'
   printf '      and it puts playbook on PATH for every shell, including the ones Claude\n'
