@@ -119,7 +119,9 @@ caveats_ok() {
   local f="$1" block
   block="$(caveat_block "$f")"
   [[ "$(grep -c '^  def caveats$' "$f")" -eq 1 ]] \
-    && grep -qF 'installs `playbook`, `pbtop`, `pbdoc` and `pbsync`.' <<<"$block" \
+    && grep -qF 'installs the `playbook` and `pbtop` commands' <<<"$block" \
+    && grep -qF 'helpers `pbdoc` and `pbsync`' <<<"$block" \
+    && grep -qF 'playbook sync enable' <<<"$block" \
     && grep -qF 'Run `playbook setup` once' <<<"$block" \
     && grep -qF '`playbook@amplifiedengineer`' <<<"$block" \
     && grep -qF '`amplifiedengineer/marketplace`' <<<"$block" \
@@ -167,7 +169,8 @@ dir="$(release 9.3.0)"
 if DOWNLOAD_BASE="file://$dir" bash "$script" 9.3.0 "$pbf" >/dev/null 2>"$work/err" \
   && ! grep -q 'pbdoc' "$pbf" \
   && ! grep -q 'resource.*pbsync\|pbsync --version' "$pbf" \
-  && grep -qF 'installs `playbook` and `pbtop`.' "$pbf" \
+  && grep -qF 'installs the `playbook` and `pbtop` commands.' "$pbf" \
+  && ! grep -q 'playbook sync enable' "$pbf" \
   && [[ "$(grep -c '^  def caveats$' "$pbf")" -eq 1 ]] \
   && [[ "$(grep -c '/download/v9.3.0/playbook-9.3.0-' "$pbf")" -eq 4 ]] \
   && ruby -c "$pbf" >/dev/null; then
