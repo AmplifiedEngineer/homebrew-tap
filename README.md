@@ -8,7 +8,7 @@ Homebrew tap for the [amplifiedengineer/playbook](https://github.com/amplifieden
 |---|---|---|
 | `playbook` | `brew install amplifiedengineer/tap/playbook` | The Claude Code plugin toolkit and its binary. It links `pbtop` to `playbook`. |
 | `pbtop` | `brew install amplifiedengineer/tap/pbtop` | The token and cost dashboard, for a machine without `playbook`. |
-| `helios` | `brew install amplifiedengineer/tap/helios` | The Helios terminal client. The formula appears at the first Helios release. It is not installable yet. |
+| `helios` | `brew install amplifiedengineer/tap/helios` | The Helios terminal client. |
 
 ## Install
 
