@@ -38,7 +38,7 @@ case "$name" in
   helios)
     repo="helios"; prefix="v"; suffix=".tar.gz"
     class_name="Helios"; alias_bin=""
-    desc="Keyboard-first terminal client for reviewing pull requests and watching CI across GitHub hosts"
+    desc="Terminal UI for your pull requests across GitHub accounts and hosts"
     ;;
   *)
     echo "::error::no release mapping for formula '${name}'" >&2

@@ -263,6 +263,14 @@ if [[ "$sums_ok" -eq 1 ]] \
 else
   fail "the helios formula has the SUMS checksums, a livecheck regex, its own notes line and no playbook parts"
 fi
+# brew audit rejects a desc of 80 characters or more.
+desc_limit=80
+desc_len="$(sed -n 's/^  desc "\(.*\)"$/\1/p' "$helios" | head -n1 | tr -d '\n' | wc -c | tr -d ' ')"
+if [[ "$desc_len" -gt 0 && "$desc_len" -lt "$desc_limit" ]]; then
+  pass "the helios desc is shorter than the brew audit limit"
+else
+  fail "the helios desc is shorter than the brew audit limit ($desc_len characters)"
+fi
 cp "$helios" "$work/h/first.rb"
 if DOWNLOAD_BASE="file://$dir" bash "$script" 9.8.0 "$helios" >/dev/null 2>"$work/err" \
   && cmp -s "$helios" "$work/h/first.rb"; then
