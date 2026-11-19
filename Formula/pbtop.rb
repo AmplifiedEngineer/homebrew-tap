@@ -11,21 +11,21 @@ class Pbtop < Formula
 
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/amplifiedengineer/playbook/releases/download/v0.44.0/pbtop-0.44.0-aarch64-apple-darwin.tar.gz"
-      sha256 "5ee363098c74cc5e4bda8954c5eca08ec32d6a506ce78ebeb3c12417e788f771"
+      url "https://github.com/amplifiedengineer/playbook/releases/download/v0.45.0/pbtop-0.45.0-aarch64-apple-darwin.tar.gz"
+      sha256 "97f68a0a2abfd3020466eec89da5df4c5cffa6099fed389da44ce416cc999801"
     else
-      url "https://github.com/amplifiedengineer/playbook/releases/download/v0.44.0/pbtop-0.44.0-x86_64-apple-darwin.tar.gz"
-      sha256 "6a1d3431dc86a0701c87f05371fe44d8e2c1ecb550f326f14b5d1fc9fe922ddc"
+      url "https://github.com/amplifiedengineer/playbook/releases/download/v0.45.0/pbtop-0.45.0-x86_64-apple-darwin.tar.gz"
+      sha256 "c122e6fc02cfa6fa07f32c57dca58392e3b7cb9fcf1781415950a54a7e00a3c3"
     end
   end
 
   on_linux do
     if Hardware::CPU.arm?
-      url "https://github.com/amplifiedengineer/playbook/releases/download/v0.44.0/pbtop-0.44.0-aarch64-unknown-linux-musl.tar.gz"
-      sha256 "796f454a08fdbeef0ab8b5bf19f68ae99e60983f4589fef77283c04b2961551f"
+      url "https://github.com/amplifiedengineer/playbook/releases/download/v0.45.0/pbtop-0.45.0-aarch64-unknown-linux-musl.tar.gz"
+      sha256 "e845e4128dd9eca17ad9d417ddcc892147fe7ce9d10298ff5391038a6b1f641c"
     else
-      url "https://github.com/amplifiedengineer/playbook/releases/download/v0.44.0/pbtop-0.44.0-x86_64-unknown-linux-musl.tar.gz"
-      sha256 "82347233e8b37433fe1c43298a88e785426c8032b256f04b925d259d5b07538f"
+      url "https://github.com/amplifiedengineer/playbook/releases/download/v0.45.0/pbtop-0.45.0-x86_64-unknown-linux-musl.tar.gz"
+      sha256 "64e485490f17f0fb056b07c5d4465c8679f429d7edc30fd7320a273d943fc3ba"
     end
   end
 
